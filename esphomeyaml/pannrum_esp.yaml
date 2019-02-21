@@ -9,12 +9,6 @@ wifi:
   domain: '.landin.lan'
   fast_connect: true
 
-# mqtt:
-#   broker: !secret mqtt_broker_ip
-#   username: !secret mqtt_username
-#   password: !secret mqtt_password
-#   discovery: clean
-
 # Enable logging
 logger:
 
@@ -37,6 +31,21 @@ sensor:
     trigger_pin: D5
     echo_pin: D6
     name: "Pellet Level"
+    filters:
+    - lambda: return ((1.1 - x) / 0.9) * 100;
+    - filter_nan:
+    - sliding_window_moving_average:
+        window_size: 30
+        send_every: 30
+    - heartbeat: 5min
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
   - platform: dallas
     address: 0x0D0008022A1D9710
     name: "Furnace Room Temperature"
+    filters:
+    - heartbeat: 5min
+    - sliding_window_moving_average:
+        window_size: 30
+        send_every: 30
+    accuracy_decimals: 0
