@@ -1,0 +1,42 @@
+esphomeyaml:
+  name: pannrum_esp
+  platform: ESP8266
+  board: nodemcuv2
+
+wifi:
+  ssid: 'landin iot'
+  password: !secret landin_iot_wifi_password
+  domain: '.landin.lan'
+  fast_connect: true
+
+# mqtt:
+#   broker: !secret mqtt_broker_ip
+#   username: !secret mqtt_username
+#   password: !secret mqtt_password
+#   discovery: clean
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+   password: !secret esp_api_password
+
+ota:
+  password: !secret esp_ota_password
+
+dallas:
+  - pin: D7
+
+binary_sensor:
+  - platform: status
+    name: "Pannrum Status"
+
+sensor:
+  - platform: ultrasonic
+    trigger_pin: D5
+    echo_pin: D6
+    name: "Pellet Level"
+  - platform: dallas
+    address: 0x0D0008022A1D9710
+    name: "Furnace Room Temperature"
