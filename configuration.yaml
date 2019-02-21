@@ -57,7 +57,7 @@ history:
 logbook:
 
 # Enables a map showing the location of tracked devices
-map:
+#map:
 
 # Track the sun
 sun:
@@ -72,7 +72,7 @@ tts:
   - platform: google
 
 # Cloud
-cloud:
+#cloud:
 
 group: !include groups.yaml
 automation: !include automations.yaml
@@ -107,4 +107,21 @@ device_tracker:
     username: root
     password: !secret router_password
 
-#test
+#Person tracking
+person:
+  - name: Larre
+    id: larre
+    device_trackers:
+      - device_tracker.larre
+  - name: Camilla
+    id: camilla
+    device_trackers:
+      - device_tracker.camilla
+  - name: Hugo
+    id: hugo
+    device_trackers:
+      - device_tracker.hugo
+  - name: Tekla
+    id: tekla
+    device_trackers:
+      - device_tracker.tekla
