@@ -111,6 +111,7 @@ device_tracker:
 person:
   - name: Larre
     id: larre
+    user_id: d533fc5016334f9ea95e79d94dbbc3d5
     device_trackers:
       - device_tracker.larre
   - name: Camilla
