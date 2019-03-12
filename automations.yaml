@@ -8,11 +8,12 @@
   - data:
       message: Slack test again
     service: notify.slack_notify
+    
 - id: '12345'
   alias: Pellet level warning 50%
   trigger:
-  - above: '0.7'
-    below: '0.8'
+  - above: '20'
+    below: '50'
     entity_id: sensor.pellet_level_2
     for:
       hours: 1
@@ -25,11 +26,12 @@
   - data:
       message: Det är cirka 50 procent pellets i tunnan
     service: notify.slack_notify
+
 - id: '23456'
   alias: Pellet level warning 20%
   trigger:
-  - above: '0.9'
-    below: '1.2'
+  - above: '0.0'
+    below: '20'
     entity_id: sensor.pellet_level_2
     for:
       hours: 1
@@ -42,6 +44,7 @@
   - data:
       message: Det är cirka 20 procent pellets i tunnan
     service: notify.slack_notify
+
 - id: '34567'
   alias: Let's Encrypt Renewal
   trigger:

@@ -6,7 +6,8 @@
 !*.yaml
 !.gitignore
 !*.md
-!esphomeyaml
+!esphome
+!packages
 
 # Ignore folders.
 .storage
