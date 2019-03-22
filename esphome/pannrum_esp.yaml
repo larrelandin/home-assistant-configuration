@@ -32,7 +32,7 @@ sensor:
     echo_pin: D6
     name: "Pellet Level"
     filters:
-    - lambda: return ((1.1 - x) / 0.9) * 100;
+    - lambda: return ((1.1 - x) / 0.85) * 100;
     - filter_nan:
     # - sliding_window_moving_average:
     #     window_size: 30
