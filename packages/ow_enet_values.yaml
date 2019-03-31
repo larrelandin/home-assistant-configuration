@@ -1,0 +1,15 @@
+homeassistant:
+  sensor:
+    # Temp from OW Server
+  - platform: snmp
+    name: ow_boiler_temp
+    host: 192.168.10.31
+    baseoid: 1.3.6.1.4.1.31440.10.6.1.1.1
+    unit_of_measurement: C
+  - platform: snmp
+    name: ow_outside_temp
+    friendly_name: 'Utomhustemperatur'
+    host: 192.168.10.31
+    baseoid: 1.3.6.1.4.1.31440.10.6.1.1.5
+    unit_of_measurement: C
+    value_template: "{{states('sensor.ow_outside_temp')|round(2) }}"
