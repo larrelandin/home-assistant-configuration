@@ -141,3 +141,5 @@ person:
     id: tekla
     device_trackers:
       - device_tracker.tekla
+
+shopping_list:
