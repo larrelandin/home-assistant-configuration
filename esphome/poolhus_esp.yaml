@@ -1,0 +1,24 @@
+esphome:
+  name: poolhus_esp
+  platform: ESP8266
+  board: nodemcuv2
+
+wifi:
+  ssid: 'landin iot'
+  password: !secret landin_iot_wifi_password
+  domain: '.landin.lan'
+  fast_connect: true
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+   password: !secret esp_api_password
+
+ota:
+  password: !secret esp_ota_password
+
+binary_sensor:
+  - platform: status
+    name: "Poolhus Status"
