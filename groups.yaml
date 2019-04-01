@@ -7,3 +7,4 @@ esphomedevices:
   name: ESP Home enheter
   entities:
     -  binary_sensor.pannrum_status
+    -  binary_sensor.poolhus_status
