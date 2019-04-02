@@ -1,0 +1,4 @@
+sensor:
+  - platform: skanetrafiken_jojo
+    card_number: 1272081460
+    card_cvc: 0724
