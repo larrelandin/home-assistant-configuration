@@ -1,4 +1,5 @@
 sensor:
   - platform: skanetrafiken_jojo
+    name: Larres kort
     card_number: 1272081460
     card_cvc: 0724
