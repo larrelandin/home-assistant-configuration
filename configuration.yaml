@@ -1,16 +1,13 @@
 homeassistant:
   packages: !include_dir_named packages
+
+default_config:
   
-  # Name of the location where Home Assistant is running
   name: Home
-  # Location required to calculate the time the sun rises and sets
   latitude: 55.693862
   longitude: 13.231983
-  # Impacts weather/sunrise data (altitude above sea level in meters)
-  elevation: 0
-  # metric for Metric, imperial for Imperial
+  elevation: 29
   unit_system: metric
-  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   time_zone: CET
   # Customization file
   customize: !include customize.yaml
@@ -56,7 +53,7 @@ discovery:
 history:
 
 # View all events in a logbook
-logbook:
+#logbook:
 
 # Enables a map showing the location of tracked devices
 #map:
@@ -72,7 +69,8 @@ sensor:
 
 # Text to speech
 tts:
-  - platform: google
+  - platform: google_translate
+    service_name: google_say
 
 # Cloud
 #cloud:
@@ -81,18 +79,6 @@ group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 
-
-weblink:
-  entities:
-    - name: Unifi Controller
-      icon: mdi:access-point-network
-      url: https://hass.landin.lan:8443
-
-# panel_iframe
-  # configurator:
-  #   title: Configurator
-  #   icon: mdi:wrench
-  #   url: http://hass.landin.lan:3218
     
 # Slack App
 notify:
@@ -132,3 +118,6 @@ person:
       - device_tracker.tekla
 
 shopping_list:
+
+logger:
+  default: warn
