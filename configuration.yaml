@@ -78,6 +78,7 @@ tts:
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
+person: !include person.yaml
 
     
 # Slack App
@@ -96,26 +97,6 @@ device_tracker:
     host: 192.168.10.1
     username: root
     password: !secret router_password
-
-#Person tracking
-person:
-  - name: Larre
-    id: larre
-    user_id: d533fc5016334f9ea95e79d94dbbc3d5
-    device_trackers:
-      - device_tracker.larre
-  - name: Camilla
-    id: camilla
-    device_trackers:
-      - device_tracker.camilla
-  - name: Hugo
-    id: hugo
-    device_trackers:
-      - device_tracker.hugo
-  - name: Tekla
-    id: tekla
-    device_trackers:
-      - device_tracker.tekla
 
 shopping_list:
 
