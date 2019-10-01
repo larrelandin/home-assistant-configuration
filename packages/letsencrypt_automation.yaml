@@ -1,5 +1,5 @@
 automation:
-  - id: "45678"
+  - id: '45678'
     alias: LetsEncrypt renewal
     trigger:
       - at: 04:00:00
