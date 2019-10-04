@@ -1,86 +1,14 @@
 homeassistant:
   packages: !include_dir_named packages
-
-default_config:
-  
   name: Home
   latitude: 55.693862
   longitude: 13.231983
   elevation: 29
   unit_system: metric
   time_zone: CET
-  # Customization file
-  customize: !include customize.yaml
 
-http:
+default_config:
 
-system_health:
-
-zone:
-  - name: Home
-    latitude: 55.693862
-    longitude: 13.231983
-    radius: 50
-    icon: mdi:home
-
-# Enables the frontend
-frontend:
-  themes:  !include themes.yaml
-
-# Enables configuration UI
-config:
-
-# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
-# http:
-#   base_url: example.duckdns.org:8123
-
-# Checks for available updates
-# Note: This component will send some information about your system to
-# the developers to assist with development of Home Assistant.
-# For more information, please see:
-# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
-updater:
-  # Optional, allows Home Assistant developers to focus on popular components.
-  include_used_components: true
-
-# Discover some devices automatically
-discovery:
-
-# Allows you to issue voice commands from the frontend in enabled browsers
-#conversation:
-
-# Enables support for tracking state changes over time
-history:
-
-# View all events in a logbook
-#logbook:
-
-# Enables a map showing the location of tracked devices
-#map:
-
-# Track the sun
-sun:
-
-# Sensors
-sensor:
-  # Weather prediction
-  - platform: yr
-
-
-# Text to speech
-tts:
-  - platform: google_translate
-    service_name: google_say
-
-# Cloud
-#cloud:
-
-group: !include groups.yaml
-automation: !include automations.yaml
-script: !include scripts.yaml
-person: !include person.yaml
-
-    
 # Slack App
 notify:
   - name: slack_notify
@@ -89,6 +17,21 @@ notify:
     default_channel: '#homeautomation'
     username: "HassIO"
     
+
+zone:
+  - name: Home
+    latitude: 55.693862
+    longitude: 13.231983
+    radius: 50
+    icon: mdi:home
+
+# Discover some devices automatically
+discovery:
+
+# Sensors
+sensor:
+  # Weather prediction
+  - platform: yr
 # IOS App settings
 ios:
 
@@ -102,3 +45,9 @@ shopping_list:
 
 logger:
   default: warn
+  
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+person: !include person.yaml
+

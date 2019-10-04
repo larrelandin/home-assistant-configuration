@@ -1,0 +1,8 @@
+sensor:
+- platform: template
+  sensors:
+    heating_setpoint:
+      unit_of_measurement: "°C"
+      friendly_name: "Börvärde framledning värmepanna"
+      #icon: mdi:coolant-temperature
+      value_template: "{{ (1.4 * (-1) * float(states.sensor.ow_outside_temp.state) + 52) }}"

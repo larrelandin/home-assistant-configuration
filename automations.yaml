@@ -8,3 +8,18 @@
   - data:
       message: Slack test again
     service: notify.slack_notify
+- id: '1570009071055'
+  alias: Teknikshakt tempvarning
+  trigger:
+  - above: '-10'
+    below: '15'
+    entity_id: sensor.ow_pool_techroom_temp_rounded
+    for:
+      hours: 2
+    platform: numeric_state
+  condition: []
+  action:
+  - data:
+      message: Det är kallt i teknikshaktet, {{ states('sensor.ow_pool_techroom_temp_rounded')
+        }} grader.
+    service: notify.slack_notify

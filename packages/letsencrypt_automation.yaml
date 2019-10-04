@@ -1,26 +1,26 @@
 automation:
-  - id: '45678'
-    alias: LetsEncrypt renewal
-    trigger:
-      - at: 04:00:00
-        platform: time
-    condition:
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.LetsEncrypt_renewal.attributes.last_triggered) | int > 2592000 }}"
-    action:
-      - data:
-          message: letsencrypt-renewal startar, stänger av nginx
-        service: notify.slack_notify
-      - data:
-          addon: core_nginx_proxy
-        service: hassio.addon_stop
-      - data:
-          addon: core_letsencrypt
-        service: hassio.addon_restart
-      - delay: 00:10:00
-      - data:
-          addon: core_nginx_proxy
-        service: hassio.addon_start
-      - data:
-          message: letsencrypt-renewal har körts, nginx startad
-        service: notify.slack_notify
+- id: '1570009017055'
+  alias: LetsEncrypt renewal
+  trigger:
+    - at: 04:00:00
+      platform: time
+  condition:
+    - condition: template
+      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.LetsEncrypt_renewal.attributes.last_triggered) | int > 2592000 }}"
+  action:
+    - data:
+        message: letsencrypt-renewal startar, stänger av nginx
+      service: notify.slack_notify
+    - data:
+        addon: core_nginx_proxy
+      service: hassio.addon_stop
+    - data:
+        addon: core_letsencrypt
+      service: hassio.addon_restart
+    - delay: 00:10:00
+    - data:
+        addon: core_nginx_proxy
+      service: hassio.addon_start
+    - data:
+        message: letsencrypt-renewal har körts, nginx startad
+      service: notify.slack_notify

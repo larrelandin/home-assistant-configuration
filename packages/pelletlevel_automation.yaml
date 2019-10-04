@@ -4,7 +4,7 @@ automation:
     trigger:
     - above: '20'
       below: '50'
-      entity_id: sensor.pellet_level_2
+      entity_id: sensor.pellet_level
       for:
         hours: 1
       platform: numeric_state
@@ -21,7 +21,7 @@ automation:
     trigger:
     - above: '0.0'
       below: '20'
-      entity_id: sensor.pellet_level_2
+      entity_id: sensor.pellet_level
       for:
         hours: 1
       platform: numeric_state
