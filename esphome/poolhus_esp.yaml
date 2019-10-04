@@ -8,6 +8,11 @@ wifi:
   password: !secret landin_iot_wifi_password
   domain: '.landin.lan'
   fast_connect: true
+  
+  manual_ip:
+    static_ip: 192.168.10.61
+    gateway: 192.168.10.1
+    subnet: 255.255.255.0
 
 # Enable logging
 logger:

@@ -1,4 +1,4 @@
-esphomeyaml:
+esphome:
   name: pannrum_esp
   platform: ESP8266
   board: nodemcuv2
@@ -8,6 +8,11 @@ wifi:
   password: !secret landin_iot_wifi_password
   domain: '.landin.lan'
   fast_connect: true
+  
+  manual_ip:
+    static_ip: 192.168.10.60
+    gateway: 192.168.10.1
+    subnet: 255.255.255.0
 
 # Enable logging
 logger:
@@ -42,7 +47,7 @@ sensor:
     accuracy_decimals: 0
   - platform: dallas
     address: 0x0D0008022A1D9710
-    name: "Furnace Room Temperature"
+    name: "Pannrum"
     filters:
     - heartbeat: 5min
     - sliding_window_moving_average:
