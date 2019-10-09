@@ -12,7 +12,7 @@
   alias: Teknikshakt tempvarning
   trigger:
   - above: '-10'
-    below: '15'
+    below: '10'
     entity_id: sensor.ow_pool_techroom_temp_rounded
     for:
       hours: 2

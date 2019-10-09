@@ -69,7 +69,7 @@ sensor:
       value_template: "{{ (states.sensor.ow_boiler_temp.state|round(1)) }}"
     ow_boiler_out_temp_rounded:
       unit_of_measurement: "°C"
-      friendly_name: "Panna utgående"
+      friendly_name: "Panna framledning"
       #icon: mdi:coolant-temperature
       value_template: "{{ (states.sensor.ow_boiler_out_temp.state|round(1)) }}"
     ow_pool_temp_rounded:
