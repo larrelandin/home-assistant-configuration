@@ -1,5 +1,5 @@
 esphome:
-  name: poolhus_esp
+  name: jordkallare_esp
   platform: ESP8266
   board: nodemcuv2
 
@@ -10,7 +10,7 @@ wifi:
   fast_connect: true
   
   manual_ip:
-    static_ip: 192.168.10.61
+    static_ip: 192.168.10.62
     gateway: 192.168.10.1
     subnet: 255.255.255.0
 
@@ -24,22 +24,20 @@ api:
 ota:
   password: !secret esp_ota_password
 
-binary_sensor:
-  - platform: status
-    name: "Poolhus"
-
 # DHT11
 sensor:
   - platform: dht
     model: DHT11
-    pin: D4
+    pin: D6
     temperature:
-      name: "Temperatur poolhus"
+      name: "Temperatur Jordkällare"
       unit_of_measurement: "°C"
     humidity:
-      name: "Fukt poolhus"
+      name: "Fukt Jordkällare"
       icon: "mdi:water-percent"
       unit_of_measurement: "%"
     update_interval: 60s
 
-
+binary_sensor:
+  - platform: status
+    name: "Jordkällare"

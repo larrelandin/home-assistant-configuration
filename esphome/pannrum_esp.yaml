@@ -29,7 +29,7 @@ dallas:
 
 binary_sensor:
   - platform: status
-    name: "Pannrum Status"
+    name: "Pannrum"
 
 sensor:
   - platform: ultrasonic
