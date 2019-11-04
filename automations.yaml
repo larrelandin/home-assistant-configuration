@@ -12,7 +12,7 @@
   alias: Teknikshakt tempvarning
   trigger:
   - above: '-10'
-    below: '10'
+    below: '5'
     entity_id: sensor.ow_pool_techroom_temp_rounded
     for:
       hours: 2
@@ -22,4 +22,33 @@
   - data:
       message: Det är kallt i teknikshaktet, {{ states('sensor.ow_pool_techroom_temp_rounded')
         }} grader.
+    service: notify.slack_notify
+- id: '1572347519678'
+  alias: Pooltemp under 10
+  description: Dags att stänga poolen
+  trigger:
+  - entity_id: sensor.ow_pool_temp_rounded
+    for: '24:00:00'
+    from: '-10'
+    platform: state
+    to: '10'
+  condition: []
+  action:
+  - data:
+      message: Dags att stänga ner poolen för vintern, temperaturen är just nu {{
+        states('sensor.ow_pool_temp_rounded') }} grader.
+    service: notify.slack_notify
+- id: '1572377204755'
+  alias: Test time triggering
+  description: Trigger based on time and last execution
+  trigger:
+  - at: 08:05:00
+    platform: time
+  condition:
+  - condition: template
+    value_template: '{{ as_timestamp(now()) - as_timestamp(states.automation.test_time_triggering.attributes.last_triggered)
+      | int > 200}}'
+  action:
+  - data:
+      message: testing
     service: notify.slack_notify
