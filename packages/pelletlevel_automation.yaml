@@ -4,14 +4,14 @@ automation:
     trigger:
     - above: '20'
       below: '50'
-      entity_id: sensor.pellet_level
+      entity_id: sensor.filtered_pellet_level
       for:
         hours: 1
       platform: numeric_state
     condition:
     - condition: template
-      value_template: '{{ as_timestamp(now()) - as_timestamp(states.automation.pellet_level_warning_50.attributes.last_triggered)
-        | int > 86400 }}'
+      value_template: '{{ as_timestamp(now()) - as_timestamp(states.automation.filtered_pellet_level_warning_50.attributes.last_triggered)
+        | int > 259200 }}'
     action:
     - data:
         message: Det är cirka 50 procent pellets i tunnan
@@ -21,14 +21,14 @@ automation:
     trigger:
     - above: '0.0'
       below: '20'
-      entity_id: sensor.pellet_level
+      entity_id: sensor.filtered_pellet_level
       for:
         hours: 1
       platform: numeric_state
     condition:
     - condition: template
-      value_template: '{{ as_timestamp(now()) - as_timestamp(states.automation.pellet_level_warning_20.attributes.last_triggered)
-        | int > 86400 }}'
+      value_template: '{{ as_timestamp(now()) - as_timestamp(states.automation.filtered_pellet_level_warning_20.attributes.last_triggered)
+        | int > 259200 }}'
     action:
     - data:
         message: Det är cirka 20 procent pellets i tunnan

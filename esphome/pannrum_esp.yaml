@@ -38,11 +38,7 @@ sensor:
     name: "Pellet Level"
     filters:
     - lambda: return ((1.1 - x) / 0.85) * 100;
-    - filter_nan:
-    # - sliding_window_moving_average:
-    #     window_size: 30
-    #     send_every: 30
-    - heartbeat: 5min
+    - heartbeat: 300s
     unit_of_measurement: "%"
     accuracy_decimals: 0
   - platform: dallas

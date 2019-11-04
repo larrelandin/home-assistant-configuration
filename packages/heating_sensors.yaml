@@ -4,11 +4,22 @@ sensor:
     heating_setpoint:
       unit_of_measurement: "°C"
       friendly_name: "Panna frameledning börvärde"
-      value_template: "{{ (1.4 * (-1) * float(states.sensor.ow_outside_temp.state) + 52) }}"
+      value_template: "{{ (float(states.input_number.heating_curve.state) * (-1) * float(states.sensor.ow_outside_temp.state) + float(states.input_number.heating_offset.state)) }}"
     heating_goal_min_temp:
       unit_of_measurement: "°C"
       friendly_name: Lägsta beräknad temperatur panna
-      value_template: "{{ (((states.sensor.heating_setpoint.state | float) , (states.input_number.heating_mintemp.state | float)) | max ) + 5}}"
+      value_template: "{{ (((states.sensor.heating_setpoint.state | float) , (states.input_number.heating_mintemp.state | float)) | max ) }}"
+# Utjämnad pelletskurva
+- platform: filter
+  name: "Filtered Pellet Level"
+  entity_id: sensor.pellet_level
+  filters:
+    - filter: outlier
+      window_size: 4
+      radius: 4.0
+    - filter: lowpass
+      time_constant: 10
+      precision: 0
 
 # Trend panntemperatur
 binary_sensor:
