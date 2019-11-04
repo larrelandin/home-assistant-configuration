@@ -6,7 +6,7 @@ automation:
       platform: time
   condition:
     - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.LetsEncrypt_renewal.attributes.last_triggered) | int > 2592000 }}"
+      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.letsencrypt_renewal.attributes.last_triggered) | int > 2592000 }}"
   action:
     - data:
         message: letsencrypt-renewal startar, stänger av nginx
