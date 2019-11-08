@@ -1,0 +1,9 @@
+climate:
+  - platform: generic_thermostat
+    name: Poolhus
+    heater: switch.pool_house_relay
+    target_sensor: sensor.temperatur_poolhus
+    min_cycle_duration:
+      minutes: 3
+    min_temp: 3
+    max_temp: 25
