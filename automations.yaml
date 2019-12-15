@@ -27,11 +27,11 @@
   alias: Pooltemp under 10
   description: Dags att stänga poolen
   trigger:
-  - entity_id: sensor.ow_pool_temp_rounded
+  - above: '-10'
+    below: '10'
+    entity_id: sensor.ow_pool_temp_rounded
     for: '24:00:00'
-    from: '-10'
-    platform: state
-    to: '10'
+    platform: numeric_state
   condition: []
   action:
   - data:
@@ -51,4 +51,67 @@
   action:
   - data:
       message: testing
+    service: notify.slack_notify
+- id: '1576416157907'
+  alias: Monitor ESP Home devces
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.engine_heater_status
+    for: 00:05:00
+    from: 'on'
+    platform: state
+    to: 'off'
+  - entity_id: binary_sensor.pannrum
+    for: 00:05:00
+    from: 'on'
+    platform: state
+    to: 'off'
+  - entity_id: binary_sensor.pool_house_status
+    for: 00:05:00
+    from: 'on'
+    platform: state
+    to: 'off'
+  - entity_id: binary_sensor.poolhus
+    for: 00:05:00
+    from: 'on'
+    platform: state
+    to: 'off'
+  condition: []
+  action:
+  - data:
+      message: En ESP Home enhet har varit offline i mer än 5 minuter nu.
+    service: notify.slack_notify
+- id: '12345'
+  alias: Pellet level warning 50%
+  trigger:
+  - above: '20.0'
+    below: '50.0'
+    entity_id: sensor.filtered_pellet_level
+    for:
+      hours: 1
+    platform: numeric_state
+  condition:
+  - condition: template
+    value_template: '{{ as_timestamp(now()) - as_timestamp(states.automation.filtered_pellet_level_warning_50.attributes.last_triggered)
+      | int > 259200 }}'
+  action:
+  - data:
+      message: Det är cirka 50 procent pellets i tunnan
+    service: notify.slack_notify
+- id: '23456'
+  alias: Pellet level warning 20%
+  trigger:
+  - above: '0.0'
+    below: '20.0'
+    entity_id: sensor.filtered_pellet_level
+    for:
+      hours: 1
+    platform: numeric_state
+  condition:
+  - condition: template
+    value_template: '{{ as_timestamp(now()) - as_timestamp(states.automation.filtered_pellet_level_warning_20.attributes.last_triggered)
+      | int > 259200 }}'
+  action:
+  - data:
+      message: Det är cirka 20 procent pellets i tunnan
     service: notify.slack_notify

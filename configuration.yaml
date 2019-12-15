@@ -49,5 +49,5 @@ logger:
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
-person: !include person.yaml
+#person: !include person.yaml
 
