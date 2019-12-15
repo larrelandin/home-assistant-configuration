@@ -14,11 +14,10 @@ sensor:
   name: "Filtered Pellet Level"
   entity_id: sensor.pellet_level
   filters:
-    - filter: outlier
-      window_size: 4
-      radius: 4.0
+    - filter: time_simple_moving_average
+      window_size: 20
     - filter: lowpass
-      time_constant: 10
+      time_constant: 20
       precision: 0
 
 # Trend panntemperatur
