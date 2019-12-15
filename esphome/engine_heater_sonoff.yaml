@@ -39,9 +39,14 @@ binary_sensor:
       inverted: True
     name: "engine heater button"
     on_press:
-      then:
+      if:
+        condition:
+          switch.is_off: relay1
+        then:
         - switch.turn_on: relay1
         - delay: 1h
+        - switch.turn_off: relay1
+        else:
         - switch.turn_off: relay1
   - platform: status
     name: "engine heater status"
