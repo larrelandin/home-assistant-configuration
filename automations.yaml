@@ -53,8 +53,8 @@
       message: testing
     service: notify.slack_notify
 - id: '1576416157907'
-  alias: Monitor ESP Home devces
-  description: ''
+  alias: Monitor ESP Home devices
+  description: 'Notification when the go offline'
   trigger:
   - entity_id: binary_sensor.engine_heater_status
     for: 00:05:00
@@ -78,8 +78,33 @@
     to: 'off'
   condition: []
   action:
-  - data:
-      message: En ESP Home enhet har varit offline i mer än 5 minuter nu.
+  - data_template:
+      message: En ESP Home enhet {{ trigger.from_state.attributes.friendly_name }} har varit offline i mer än 5 minuter nu.
+    service: notify.slack_notify
+- id: '1576416157709'
+  alias: Monitor ESP Home devices
+  description: 'Notification when they go online'
+  trigger:
+  - entity_id: binary_sensor.engine_heater_status
+    from: 'off'
+    platform: state
+    to: 'on'
+  - entity_id: binary_sensor.pannrum
+    from: 'off'
+    platform: state
+    to: 'on'
+  - entity_id: binary_sensor.pool_house_status
+    from: 'off'
+    platform: state
+    to: 'on'
+  - entity_id: binary_sensor.poolhus
+    from: 'off'
+    platform: state
+    to: 'on'
+  condition: []
+  action:
+  - data_template:
+      message: En ESP Home enhet {{ trigger.from_state.attributes.friendly_name }} gick online.
     service: notify.slack_notify
 - id: '12345'
   alias: Pellet level warning 50%
