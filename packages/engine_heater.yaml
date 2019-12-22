@@ -63,6 +63,9 @@ automation:
     action:
       - service: switch.turn_off
         entity_id: switch.engine_heater_relay
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.car_heater_enable
 
   - alias: 'Sample temperature 3h before departure time'
     trigger:
