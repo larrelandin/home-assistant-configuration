@@ -14,10 +14,12 @@
   - above: '-10'
     below: '5'
     entity_id: sensor.ow_pool_techroom_temp_rounded
-    for:
-      hours: 2
+    for: '2:00:00'
     platform: numeric_state
-  condition: []
+  condition:
+  - condition: template
+    value_template: '{{ as_timestamp(now()) - as_timestamp(states.automation.teknikshakt_tempvarning.attributes.last_triggered)
+      | int > 16000000 }}'
   action:
   - data:
       message: Det är kallt i teknikshaktet, {{ states('sensor.ow_pool_techroom_temp_rounded')
@@ -32,7 +34,10 @@
     entity_id: sensor.ow_pool_temp_rounded
     for: '24:00:00'
     platform: numeric_state
-  condition: []
+  condition:
+  - condition: template
+    value_template: '{{ as_timestamp(now()) - as_timestamp(states.automation.pooltemp_under_10.attributes.last_triggered)
+      | int > 16000000}}'
   action:
   - data:
       message: Dags att stänga ner poolen för vintern, temperaturen är just nu {{
@@ -53,25 +58,11 @@
       message: testing
     service: notify.slack_notify
 - id: '1576416157907'
-  alias: Monitor ESP Home devices
-  description: 'Notification when the go offline'
+  alias: Monitor ESP Home devices - offline
+  description: Notification when they go offline
   trigger:
-  - entity_id: binary_sensor.engine_heater_status
-    for: 00:05:00
-    from: 'on'
-    platform: state
-    to: 'off'
-  - entity_id: binary_sensor.pannrum
-    for: 00:05:00
-    from: 'on'
-    platform: state
-    to: 'off'
-  - entity_id: binary_sensor.pool_house_status
-    for: 00:05:00
-    from: 'on'
-    platform: state
-    to: 'off'
-  - entity_id: binary_sensor.poolhus
+  - entity_id: binary_sensor.engine_heater_status, binary_sensor.pannrum, binary_sensor.pool_house_status,
+      binary_sensor.poolhus, binary_sensor.pannstyrning
     for: 00:05:00
     from: 'on'
     platform: state
@@ -79,32 +70,26 @@
   condition: []
   action:
   - data_template:
-      message: En ESP Home enhet {{ trigger.from_state.attributes.friendly_name }} har varit offline i mer än 5 minuter nu.
+      message: En ESP Home enhet {{ trigger.from_state.attributes.friendly_name }}
+        har varit offline i mer än 5 minuter nu.
     service: notify.slack_notify
 - id: '1576416157709'
-  alias: Monitor ESP Home devices
-  description: 'Notification when they go online'
+  alias: Monitor ESP Home devices - online
+  description: Notification when they go online
   trigger:
-  - entity_id: binary_sensor.engine_heater_status
+  - entity_id: binary_sensor.engine_heater_status, binary_sensor.pannrum, binary_sensor.pool_house_status,
+      binary_sensor.poolhus, binary_sensor.pannstyrning
     from: 'off'
     platform: state
     to: 'on'
-  - entity_id: binary_sensor.pannrum
-    from: 'off'
-    platform: state
-    to: 'on'
-  - entity_id: binary_sensor.pool_house_status
-    from: 'off'
-    platform: state
-    to: 'on'
-  - entity_id: binary_sensor.poolhus
-    from: 'off'
-    platform: state
-    to: 'on'
-  condition: []
+  condition:
+  - condition: template
+    value_template: '{{ as_timestamp(now()) - as_timestamp(states.automation.monitor_esp_home_devices_offline.attributes.last_triggered)
+      | int < 300}}'
   action:
   - data_template:
-      message: En ESP Home enhet {{ trigger.from_state.attributes.friendly_name }} gick online.
+      message: En ESP Home enhet {{ trigger.from_state.attributes.friendly_name }}
+        gick online.
     service: notify.slack_notify
 - id: '12345'
   alias: Pellet level warning 50%
@@ -139,4 +124,22 @@
   action:
   - data:
       message: Det är cirka 20 procent pellets i tunnan
+    service: notify.slack_notify
+- id: '1577049962548'
+  alias: Pelletsbrännare felindikering
+  description: ''
+  trigger:
+  - device_id: 707720f18ee448419b514e5d11008d7c
+    domain: binary_sensor
+    entity_id: binary_sensor.burner_error
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 15
+    platform: device
+    type: turned_on
+  condition: []
+  action:
+  - data:
+      message: Brännaren har stannat.
     service: notify.slack_notify
