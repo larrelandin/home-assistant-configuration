@@ -15,18 +15,6 @@ automation:
         - condition: state
           entity_id: input_boolean.car_heater_enable
           state: 'on'
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: input_boolean.car_heater_weekday
-              state: 'off'
-            - condition: time
-              weekday:
-                - mon
-                - tue
-                - wed
-                - thu
-                - fri
     action:
       - service: switch.turn_on
         entity_id: switch.engine_heater_relay
