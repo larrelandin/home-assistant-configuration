@@ -48,18 +48,6 @@ automation:
         - condition: state
           entity_id: input_boolean.car_heater_enable
           state: 'on'
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: input_boolean.car_heater_weekday
-              state: 'off'
-            - condition: time
-              weekday:
-                - mon
-                - tue
-                - wed
-                - thu
-                - fri
     action:
       - service: switch.turn_off
         entity_id: switch.engine_heater_relay
@@ -80,18 +68,6 @@ automation:
         - condition: state
           entity_id: input_boolean.car_heater_enable
           state: 'on'
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: input_boolean.car_heater_weekday
-              state: 'off'
-            - condition: time
-              weekday:
-                - mon
-                - tue
-                - wed
-                - thu
-                - fri
     action:
       service: input_number.set_value
       data_template:
@@ -122,13 +98,6 @@ input_number:
     max: 30
     step: 0.5
 
-# Boolean sensors
-input_boolean:
-  car_heater_weekday:
-    name: Exkludera helgdagar
-    icon: mdi:calendar
-  car_heater_enable:
-    name: Aktivera
     
 # Template sensors
 sensor:
@@ -179,7 +148,7 @@ sensor:
         icon_template: mdi:clock
         value_template: >
           {% if states.sensor.car_heater_departure_time.state is defined %}
-              {{ strptime(((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) - (10800))|timestamp_local), '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
+              {{ strptime(((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) - (10800 + 3600))|timestamp_local), '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
           {% else %}
               waiting for sensors
           {% endif%}
