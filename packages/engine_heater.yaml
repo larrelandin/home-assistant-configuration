@@ -86,6 +86,10 @@ input_number:
     max: 30
     step: 0.5
 
+# Boolean sensors
+input_boolean:
+  car_heater_enable:
+    name: Aktivera
     
 # Template sensors
 sensor:

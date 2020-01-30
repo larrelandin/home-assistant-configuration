@@ -32,6 +32,17 @@ discovery:
 sensor:
   # Weather prediction
   - platform: yr
+  ### system monitor ###
+  - platform: systemmonitor
+    resources:
+    - type: disk_use_percent
+      arg: /
+    - type: disk_free
+      arg: /
+    - type: memory_use_percent
+    - type: last_boot
+    - type: processor_use
+    
 # IOS App settings
 ios:
 
