@@ -3,7 +3,7 @@ sensor:
   sensors:
     heating_setpoint:
       unit_of_measurement: "°C"
-      friendly_name: "Panna frameledning börvärde"
+      friendly_name: "Panna framledning börvärde"
       value_template: "{{ (float(states.input_number.heating_curve.state) * (-1) * float(states.sensor.ow_outside_temp.state) + float(states.input_number.heating_offset.state)) }}"
     heating_goal_min_temp:
       unit_of_measurement: "°C"
