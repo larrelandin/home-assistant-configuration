@@ -62,6 +62,20 @@ automation:
         entity_id: input_number.car_heater_3h_before_temp
         value: '{{ states.sensor.ow_outside_temp_rounded.state }}'
 
+  # - alias: 'Shut down heater after 1h if manually started'
+  #   trigger:
+  #     platform: state
+  #     entity_id: switch.engine_heater_relay
+  #     # Optional
+  #     from: "off"
+  #     # Optional
+  #     to: "on"
+  #   action:
+  #     - data:
+  #         message: 'Engine heater switch manually (?) activated'
+  #       service: notify.slack_notify
+
+
 # Input sensors
 input_number:
   car_heater_hour:
