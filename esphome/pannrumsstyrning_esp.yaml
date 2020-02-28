@@ -26,6 +26,25 @@ api:
 ota:
   password: !secret esp_ota_password
 
+dallas:
+  - pin: GPIO4
+
+sensor:
+  - platform: dallas
+    address: 0x310119143EF32B28
+    name: Panntemperatur
+  - platform: dallas
+    address: 0xDD0119142F965B28
+    name: Framledningstemperatur
+
 binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO3
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "burner error"
   - platform: status
     name: "Pannrumsstyrning"
+
+
