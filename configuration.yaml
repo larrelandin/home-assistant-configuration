@@ -5,8 +5,7 @@ homeassistant:
   longitude: 13.231983
   elevation: 29
   unit_system: metric
-  time_zone: CET
-
+  time_zone: Europe/Stockholm
 default_config:
 
 # Slack App
