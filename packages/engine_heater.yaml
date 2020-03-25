@@ -62,18 +62,48 @@ automation:
         entity_id: input_number.car_heater_3h_before_temp
         value: '{{ states.sensor.ow_outside_temp_rounded.state }}'
 
-  # - alias: 'Shut down heater after 1h if manually started'
-  #   trigger:
-  #     platform: state
-  #     entity_id: switch.engine_heater_relay
-  #     # Optional
-  #     from: "off"
-  #     # Optional
-  #     to: "on"
-  #   action:
-  #     - data:
-  #         message: 'Engine heater switch manually (?) activated'
-  #       service: notify.slack_notify
+  - alias: 'Turn on heater if manually started through override'
+    trigger:
+      platform: state
+      entity_id: input_boolean.car_heater_override
+      to: 'on'
+    action:
+      service: switch.turn_on
+      entity_id: switch.engine_heater_relay
+
+  - alias: 'Turn off heater if manually started after 1 hour'
+    trigger:
+      platform: state
+      entity_id: input_boolean.car_heater_override
+      to: 'on'
+      for:
+        minutes: 60
+    action:
+      service: input_boolean.turn_off
+      entity_id: input_boolean.car_heater_override
+
+  - alias: 'Turn off heater if ovveride turns off'
+    trigger:
+      platform: state
+      entity_id: input_boolean.car_heater_override
+      to: 'off'
+    action:
+      service: switch.turn_off
+      entity_id: switch.engine_heater_relay
+
+  - alias: 'Car heater enable switch is disabled'
+    trigger:
+      platform: state
+      entity_id: input_boolean.car_heater_enable
+      to: 'off'
+    condition:
+      condition: state
+      entity_id: input_boolean.car_heater_override
+      state: 'off'
+    action:
+      service: switch.turn_off
+      entity_id: switch.engine_heater_relay
+
 
 
 # Input sensors
@@ -103,7 +133,9 @@ input_number:
 # Boolean sensors
 input_boolean:
   car_heater_enable:
-    name: Aktivera
+    name: Aktivera timer
+  car_heater_override:
+    name: "Forcera timer (1 timme)"
     
 # Template sensors
 sensor:
@@ -140,7 +172,7 @@ sensor:
         value_template: >
           {% if states.sensor.car_heater_departure_time.state is defined %}
             {% if ((states('sensor.car_heater_run_time')|float) > 0) %}
-              {{ strptime(((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) - (states('sensor.car_heater_run_time')|float * 3600 + 3600))|timestamp_local), '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
+              {{ strptime(((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) - (states('sensor.car_heater_run_time')|float * 3600))|timestamp_local), '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
             {%else%}
               Never
             {%endif%}
@@ -154,7 +186,7 @@ sensor:
         icon_template: mdi:clock
         value_template: >
           {% if states.sensor.car_heater_departure_time.state is defined %}
-              {{ strptime(((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) - (10800 + 3600))|timestamp_local), '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
+              {{ strptime(((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) - (10800))|timestamp_local), '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
           {% else %}
               waiting for sensors
           {% endif%}
@@ -164,4 +196,4 @@ sensor:
         friendly_name: 'Faktisk stopptid (+15 min)'
         icon_template: mdi:clock
         value_template: >
-         {{ strptime((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) - (float ( 45*60 )))|timestamp_local, '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
+         {{ strptime((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) - (float ( 15*60 )))|timestamp_local, '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
