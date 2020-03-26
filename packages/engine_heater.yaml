@@ -29,7 +29,6 @@ automation:
       condition: and
       conditions:
         - condition: template
-          #value_template: '{{ now().time().strftime("%H:%M") == states.sensor.car_heater_departure_time.state }}'
           value_template: '{{ now().time().strftime("%H:%M") == states.sensor.car_heater_actual_stop_time.state }}'
         - condition: template
           value_template: '{{ states.sensor.car_heater_run_time.state|float > 0 }}'
@@ -59,7 +58,7 @@ automation:
     action:
       service: input_number.set_value
       data_template:
-        entity_id: input_number.car_heater_3h_before_temp
+        entity_id: input_number.car_heater_estimated_outside_temp
         value: '{{ states.sensor.ow_outside_temp_rounded.state }}'
 
   - alias: 'Turn on heater if manually started through override'
@@ -91,7 +90,18 @@ automation:
       service: switch.turn_off
       entity_id: switch.engine_heater_relay
 
-  - alias: 'Car heater enable switch is disabled'
+  - alias: 'Car heater timer enabled'
+    trigger:
+      platform: state
+      entity_id: input_boolean.car_heater_enable
+      to: 'on'
+    action:
+      service: input_number.set_value
+      data_template:
+        entity_id: input_number.car_heater_estimated_outside_temp
+        value: '{{ states.sensor.ow_outside_temp_rounded.state }}'
+
+  - alias: 'Car heater timer disabled'
     trigger:
       platform: state
       entity_id: input_boolean.car_heater_enable
@@ -122,7 +132,7 @@ input_number:
     max: 55
     step: 5
 
-  car_heater_3h_before_temp:
+  car_heater_estimated_outside_temp:
     name: Uppskattad temperatur
     unit_of_measurement: °C
     icon: mdi:thermometer
@@ -156,9 +166,9 @@ sensor:
         friendly_name: 'Beräknad gångtid'
         unit_of_measurement: h
         value_template: >
-          {% if ((states('input_number.car_heater_3h_before_temp')|float) < 10) %}
-            {% if not states('input_number.car_heater_3h_before_temp') == 'unknown' %}
-              {{(states('input_number.car_heater_3h_before_temp')|float * (-0.05) + 1)|round(1)}}
+          {% if ((states('input_number.car_heater_estimated_outside_temp')|float) < 10) %}
+            {% if not states('input_number.car_heater_estimated_outside_temp') == 'unknown' %}
+              {{(states('input_number.car_heater_estimated_outside_temp')|float * (-0.05) + 1)|round(1)}}
             {%endif%}
           {%else%}
             0
