@@ -8,11 +8,11 @@ homeassistant:
   time_zone: Europe/Stockholm
 
   auth_providers:
+    - type: homeassistant
     - type: trusted_networks
       trusted_networks:
         - 172.30.32.0/23
         - 192.168.10.0/24
-        - fd98:140a:321::1/60
 
 default_config:
 
