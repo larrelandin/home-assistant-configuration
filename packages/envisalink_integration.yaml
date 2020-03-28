@@ -1,0 +1,41 @@
+envisalink:
+  host: 192.168.10.33
+  panel_type: DSC
+  user_name: user
+  password: !secret envisalink_password
+  port: 4025
+  evl_version: 4
+  keepalive_interval: 60
+  zonedump_interval: 30
+  timeout: 10
+  panic_type: Police
+  zones:
+    49:
+      name: 'Guest Door'
+      type: 'door'
+    50:
+      name: 'Kitchen Door'
+      type: 'door'
+    51:
+      name: 'Front Door'
+      type: 'door'
+    11:
+      name: 'Skylight lavatory'
+      type: 'window'
+    12:
+      name: 'Skylight hall'
+      type: 'window'
+    13: 
+      name: 'Skylight bathroom'
+      type: 'window'
+    5:
+      name: 'Skylight South East'
+      type: 'window'
+    6:
+      name: 'Skylight South West'
+      type: 'window'
+  partitions:
+    1:
+      name: 'Huset'
+    2:
+      name: 'Guest area'
