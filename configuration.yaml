@@ -6,6 +6,14 @@ homeassistant:
   elevation: 29
   unit_system: metric
   time_zone: Europe/Stockholm
+
+  auth_providers:
+    - type: trusted_networks
+      trusted_networks:
+        - 172.30.32.0/23
+        - 192.168.10.0/24
+        - fd98:140a:321::1/60
+
 default_config:
 
 # Slack App
@@ -59,5 +67,5 @@ logger:
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
-#person: !include person.yaml
+
 
