@@ -24,6 +24,7 @@ notify:
     default_channel: '#homeautomation'
     username: "HassIO"
     
+shelly:
 
 zone:
   - name: Home
