@@ -1,0 +1,10 @@
+shelly:
+  discovery: true  #add all devices (default)
+  sensors:
+    - switch
+  devices:
+    - id: "D3F12E"
+      name: "Shelly Dimmer Köket"
+    - id: "7685b1"
+      name: "Shelly Brytare Hall"
+      light_switch: true
