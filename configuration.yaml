@@ -16,6 +16,9 @@ homeassistant:
 
 default_config:
 
+recorder:
+  db_url: mysql://homeassistant:r1*snuG0F#6hgEb@core-mariadb/homeassistant?charset=utf8
+
 # Slack App
 notify:
   - name: slack_notify
