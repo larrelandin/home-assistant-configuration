@@ -10,15 +10,33 @@ envisalink:
   timeout: 10
   panic_type: Police
   zones:
-    49:
-      name: 'Guest Door'
-      type: 'door'
-    50:
-      name: 'Kitchen Door'
-      type: 'door'
-    51:
-      name: 'Front Door'
-      type: 'door'
+    1:
+      name: 'Kitchen'
+      type: 'motion'
+    2:
+      name: 'Guest room'
+      type: 'motion'
+    3:
+      name: 'Smoke detektor'
+      type: 'smoke'
+    4:
+      name: 'Lockswitch Front door'
+      type: 'lock'
+    5:
+      name: 'Skylight South East'
+      type: 'window'
+    6:
+      name: 'Skylight South West'
+      type: 'window'
+    7:
+      name: 'Guest room windows'
+      type: 'window'
+    9:
+      name: 'Entrance'
+      type: 'motion'
+    10:
+      name: 'Living room'
+      type: 'motion'
     11:
       name: 'Skylight lavatory'
       type: 'window'
@@ -28,14 +46,48 @@ envisalink:
     13: 
       name: 'Skylight bathroom'
       type: 'window'
-    5:
-      name: 'Skylight South East'
+    14:
+      name: 'Library'
+      type: 'motion'
+    15:
+      name: 'Hallway upstairs'
+      type: 'motion'
+    16:
+      name: 'Windows upstairs north'
       type: 'window'
-    6:
-      name: 'Skylight South West'
+    17:
+      name: 'Windows TV room'
       type: 'window'
+    49:
+      name: 'Guest Door'
+      type: 'door'
+    50:
+      name: 'Kitchen Door'
+      type: 'door'
+    51:
+      name: 'Front Door'
+      type: 'door'
+
   partitions:
     1:
       name: 'Huset'
     2:
       name: 'Guest area'
+
+group:
+  motion_all_house:
+    name: 'Motion all house'
+    entities:
+      - binary_sensor.kitchen
+      - binary_sensor.guest_room
+      - binary_sensor.entrance
+      - binary_sensor.living_room
+      - binary_sensor.library
+      - binary_sensor.hallway_upstairs
+
+  doors:
+    name: 'All outer doors'
+    entities:
+      - binary_sensor.front_door
+      - binary_sensor.guest_door
+      - binary_sensor.kitchen_door
