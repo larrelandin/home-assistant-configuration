@@ -44,7 +44,7 @@ binary_sensor:
       - light.toggle: light1
 
   - platform: status
-    name: "Bibliotek Status"
+    name: "Bibliotek Sonoff"
 output:
   - platform: gpio
     pin: GPIO12
