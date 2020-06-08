@@ -1,0 +1,38 @@
+esphome:
+  name: lightsensor_esp
+  platform: ESP8266
+  board: nodemcuv2
+
+wifi:
+  ssid: 'landin iot'
+  password: !secret landin_iot_wifi_password
+  domain: '.landin.lan'
+  fast_connect: true
+  
+  manual_ip:
+    static_ip: 192.168.10.65
+    gateway: 192.168.10.1
+    subnet: 255.255.255.0
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Lightsensor Esp Fallback Hotspot"
+    password: "AfKzGFsMB3n1"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+   password: !secret esp_api_password
+
+ota:
+  password: !secret esp_ota_password
+
+sensor:
+  - platform: adc
+    pin: A0
+    name: "Dagsljus"
+    update_interval: 60s
