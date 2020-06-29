@@ -11,83 +11,95 @@ envisalink:
   panic_type: Police
   zones:
     1:
-      name: 'Kitchen'
+      name: 'Kök'
       type: 'motion'
     2:
-      name: 'Guest room'
+      name: 'Gästrum'
       type: 'motion'
     3:
-      name: 'Smoke detektor'
+      name: 'Rökdetektor'
       type: 'smoke'
     4:
-      name: 'Lockswitch Front door'
+      name: 'Låsbrytare framsida'
       type: 'lock'
     5:
-      name: 'Skylight South East'
+      name: 'Takfönster sydost'
       type: 'window'
     6:
-      name: 'Skylight South West'
+      name: 'Takfönster sydväst'
       type: 'window'
     7:
-      name: 'Guest room windows'
+      name: 'Fönster Gästrum'
       type: 'window'
     9:
-      name: 'Entrance'
+      name: 'Hall'
       type: 'motion'
     10:
-      name: 'Living room'
+      name: 'Vardagsrum'
       type: 'motion'
     11:
-      name: 'Skylight lavatory'
+      name: 'Takfönster toa'
       type: 'window'
     12:
-      name: 'Skylight hall'
+      name: 'Takfönster hall'
       type: 'window'
     13: 
-      name: 'Skylight bathroom'
+      name: 'Takfönster badrum'
       type: 'window'
     14:
-      name: 'Library'
+      name: 'Bibliotek'
       type: 'motion'
     15:
-      name: 'Hallway upstairs'
+      name: 'Hall ovanvåning'
       type: 'motion'
     16:
-      name: 'Windows upstairs north'
+      name: 'Fönster norra gaveln'
       type: 'window'
     17:
-      name: 'Windows TV room'
+      name: 'Fönster TV rum'
       type: 'window'
     49:
-      name: 'Guest Door'
+      name: 'Gästingång'
       type: 'door'
     50:
-      name: 'Kitchen Door'
+      name: 'Köksdörr'
       type: 'door'
     51:
-      name: 'Front Door'
+      name: 'Dörr framsida'
       type: 'door'
 
   partitions:
     1:
       name: 'Huset'
     2:
-      name: 'Guest area'
+      name: 'Gästzon'
 
 group:
   motion_all_house:
-    name: 'Motion all house'
+    name: 'Rörelse hela huset'
     entities:
-      - binary_sensor.kitchen
-      - binary_sensor.guest_room
-      - binary_sensor.entrance
-      - binary_sensor.living_room
-      - binary_sensor.library
-      - binary_sensor.hallway_upstairs
+      - binary_sensor.kok
+      - binary_sensor.gastrum
+      - binary_sensor.hall
+      - binary_sensor.vardagsrum
+      - binary_sensor.bibliotek
+      - binary_sensor.hall_ovanvaning
 
   doors:
-    name: 'All outer doors'
+    name: 'Ytterdörrar'
     entities:
-      - binary_sensor.front_door
-      - binary_sensor.guest_door
-      - binary_sensor.kitchen_door
+      - binary_sensor.dorr_framsida
+      - binary_sensor.gastingang
+      - binary_sensor.koksdorr
+
+  windows:
+    name: 'Fönster'
+    entities:
+      - binary_sensor.fonster_tv_rum
+      - binary_sensor.fonster_norra_gaveln
+      - binary_sensor.fonster_gastrum
+      - binary_sensor.takfonster_badrum
+      - binary_sensor.takfonster_hall
+      - binary_sensor.takfonster_toa
+      - binary_sensor.takfonster_sydost
+      - binary_sensor.takfonster_sydvast
