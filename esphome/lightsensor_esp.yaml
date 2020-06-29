@@ -31,8 +31,18 @@ api:
 ota:
   password: !secret esp_ota_password
 
+binary_sensor:
+  - platform: status
+    name: "Poolhus"
+
 sensor:
-  - platform: adc
+  - platform: adc 
     pin: A0
     name: "Dagsljus"
     update_interval: 60s
+    unit_of_measurement: "lx"
+    filters:
+      - lambda: return 100.0 - (x * 100.0);
+      - sliding_window_moving_average:
+          window_size: 15
+          send_every: 15
