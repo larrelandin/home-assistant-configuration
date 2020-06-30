@@ -44,5 +44,5 @@ sensor:
     filters:
       - lambda: return 100.0 - (x * 100.0);
       - sliding_window_moving_average:
-          window_size: 15
-          send_every: 15
+          window_size: 30
+          send_every: 30
