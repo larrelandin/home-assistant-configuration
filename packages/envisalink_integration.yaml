@@ -3,6 +3,7 @@ envisalink:
   panel_type: DSC
   user_name: user
   password: !secret envisalink_password
+  code: !secret envisalink_code
   port: 4025
   evl_version: 4
   keepalive_interval: 60
