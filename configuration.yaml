@@ -54,6 +54,9 @@ sensor:
     - type: memory_use_percent
     - type: last_boot
     - type: processor_use
+  # SMHI Rain
+  - platform: Smhirain
+    station: '53430'
     
 # IOS App settings
 ios:
@@ -63,6 +66,7 @@ device_tracker:
     host: 192.168.10.1
     username: root
     password: !secret router_password
+    consider_home: 240
 
 shopping_list:
 
