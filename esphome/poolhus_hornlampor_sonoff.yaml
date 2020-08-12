@@ -1,5 +1,5 @@
 esphome:
-  name: bibliotek_sonoff
+  name: poolhus_hornlampor_sonoff
   platform: ESP8266
   board: esp01_1m
 
@@ -16,7 +16,7 @@ wifi:
 
  # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Bibliotek Sonoff"
+    ssid: "Poolhus Hornlampor Sonoff"
     password: "AfKzGFsMB3n1"
 
 captive_portal:
@@ -37,20 +37,20 @@ binary_sensor:
       number: GPIO0
       mode: INPUT_PULLUP
       inverted: True
-    name: "Bibliotek Button"
-    id: bibliotek_button
+    name: "Poolhus Hörnlampor Knapp"
+    id: poolhus_hornlampor_button
     on_press:
       then:
       - light.toggle: light1
 
   - platform: status
-    name: "Bibliotek Sonoff"
+    name: "Poolhus Hörnlampor Sonoff"
 output:
   - platform: gpio
     pin: GPIO12
     id: relay1
 light:
   - platform: binary
-    name: "Läslampa Bibliotek"
+    name: "Hörnlampor Poolhus"
     id: light1
     output: relay1
