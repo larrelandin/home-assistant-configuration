@@ -4,7 +4,12 @@ shelly:
     - switch
   devices:
     - id: "D3F12E"
-      name: "Shelly Dimmer Köket"
+      name: "Bänkbelysning Köket"
     - id: "7685b1"
-      name: "Shelly Brytare Hall"
+      name: "Lampa Hall"
+      light_switch: true
+    - id: "E09806966C6B"
+      name: "Takspottar Vardagsrum"
+    - id: "E098069693A3"
+      name: "Fönsterlampor Vardagsrum"
       light_switch: true
