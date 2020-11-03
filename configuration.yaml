@@ -42,8 +42,6 @@ discovery:
 
 # Sensors
 sensor:
-  # Weather prediction
-  - platform: yr
   ### system monitor ###
   - platform: systemmonitor
     resources:
@@ -57,6 +55,9 @@ sensor:
   # SMHI Rain
   - platform: Smhirain
     station: '53430'
+
+  # Swedish calendar
+  - platform: swedish_calendar
     
 # IOS App settings
 ios:
