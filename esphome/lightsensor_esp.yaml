@@ -38,11 +38,19 @@ binary_sensor:
 sensor:
   - platform: adc 
     pin: A0
-    name: "Dagsljus"
+    name: "Dagsljus ofiltrerat"
+    id: daylight_unfiltered
     update_interval: 60s
     unit_of_measurement: "lx"
+    filters:       
+    - lambda: return 100.0 - (x * 100.0);
+    
+  - platform: template
+    name: "Dagsljus"
+    id: daylight_filtered
+    unit_of_measurement: "lx"
+    lambda: return id(daylight_unfiltered).state;
     filters:
-      - lambda: return 100.0 - (x * 100.0);
-      - sliding_window_moving_average:
-          window_size: 30
-          send_every: 30
+    - exponential_moving_average:
+        alpha: 0.1
+        send_every: 10
