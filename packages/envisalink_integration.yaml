@@ -12,10 +12,10 @@ envisalink:
   panic_type: Police
   zones:
     1:
-      name: 'Kök'
+      name: 'IR Kök'
       type: 'motion'
     2:
-      name: 'Gästrum'
+      name: 'IR Gästrum'
       type: 'motion'
     3:
       name: 'Rökdetektor'
@@ -24,34 +24,34 @@ envisalink:
       name: 'Låsbrytare framsida'
       type: 'lock'
     5:
-      name: 'Takfönster sydost'
+      name: 'Fönster tak sydost'
       type: 'window'
     6:
-      name: 'Takfönster sydväst'
+      name: 'Fönster tak sydväst'
       type: 'window'
     7:
       name: 'Fönster Gästrum'
       type: 'window'
     9:
-      name: 'Hall'
+      name: 'IR Hall'
       type: 'motion'
     10:
-      name: 'Vardagsrum'
+      name: 'IR Vardagsrum'
       type: 'motion'
     11:
-      name: 'Takfönster toa'
+      name: 'Fönster tak toa'
       type: 'window'
     12:
-      name: 'Takfönster hall'
+      name: 'Fönster tak hall'
       type: 'window'
     13: 
-      name: 'Takfönster badrum'
+      name: 'Fönster tak badrum'
       type: 'window'
     14:
-      name: 'Bibliotek'
+      name: 'IR Bibliotek'
       type: 'motion'
     15:
-      name: 'Hall ovanvåning'
+      name: 'IR Hall ovanvåning'
       type: 'motion'
     16:
       name: 'Fönster norra gaveln'
@@ -60,13 +60,13 @@ envisalink:
       name: 'Fönster TV rum'
       type: 'window'
     49:
-      name: 'Gästingång'
+      name: 'Dörr Gästingång'
       type: 'door'
     50:
-      name: 'Köksdörr'
+      name: 'Dörr Kök'
       type: 'door'
     51:
-      name: 'Dörr framsida'
+      name: 'Dörr Framsida'
       type: 'door'
 
   partitions:
@@ -79,19 +79,19 @@ group:
   motion_all_house:
     name: 'Rörelse hela huset'
     entities:
-      - binary_sensor.kok
-      - binary_sensor.gastrum
-      - binary_sensor.hall
-      - binary_sensor.vardagsrum
-      - binary_sensor.bibliotek
-      - binary_sensor.hall_ovanvaning
+      - binary_sensor.ir_kok
+      - binary_sensor.ir_gastrum
+      - binary_sensor.ir_hall
+      - binary_sensor.ir_vardagsrum
+      - binary_sensor.ir_bibliotek
+      - binary_sensor.ir_hall_ovanvaning
 
   doors:
     name: 'Ytterdörrar'
     entities:
       - binary_sensor.dorr_framsida
-      - binary_sensor.gastingang
-      - binary_sensor.koksdorr
+      - binary_sensor.dorr_gastingang
+      - binary_sensor.dorr_kok
 
   windows:
     name: 'Fönster'
@@ -99,8 +99,8 @@ group:
       - binary_sensor.fonster_tv_rum
       - binary_sensor.fonster_norra_gaveln
       - binary_sensor.fonster_gastrum
-      - binary_sensor.takfonster_badrum
-      - binary_sensor.takfonster_hall
-      - binary_sensor.takfonster_toa
-      - binary_sensor.takfonster_sydost
-      - binary_sensor.takfonster_sydvast
+      - binary_sensor.fonster_tak_badrum
+      - binary_sensor.fonster_tak_hall
+      - binary_sensor.fonster_tak_toa
+      - binary_sensor.fonster_tak_sydost
+      - binary_sensor.fonster_tak_sydvast
