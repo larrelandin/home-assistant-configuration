@@ -35,12 +35,29 @@ sensor:
   - platform: ultrasonic
     trigger_pin: D5
     echo_pin: D6
-    name: "Pellet Level"
-    filters:
-    - lambda: return ((1.0 - x) / 0.85) * 100;
-    - heartbeat: 300s
+    name: "Pellet Level Raw"
+    id: pellet_level_raw
+    # filters:
+    # - lambda: return ((1.0 - x) / 0.85) * 100;
+    # - heartbeat: 300s
+    # accuracy_decimals: 
+
+  - platform: template
+    name: "Pellet Level Calculated"
+    id: pellet_level_calculated
     unit_of_measurement: "%"
-    accuracy_decimals: 0
+    lambda: return ((1.0 - id(pellet_level_raw).state) / 0.85) * 100;
+
+  - platform: template
+    name: "Pellet Level"
+    id: pellet_level_filtered
+    unit_of_measurement: "%"
+    lambda: return id(pellet_level_calculated).state;
+    filters:
+    - sliding_window_moving_average:
+        window_size: 30
+        send_every: 30
+
   - platform: dallas
     address: 0x0D0008022A1D9710
     name: "Pannrum"
