@@ -1,11 +1,5 @@
 homeassistant:
   packages: !include_dir_named packages
-  name: Home
-  latitude: 55.693862
-  longitude: 13.231983
-  elevation: 29
-  unit_system: metric
-  time_zone: Europe/Stockholm
 
   auth_providers:
     - type: homeassistant
@@ -17,7 +11,7 @@ homeassistant:
 default_config:
 
 recorder:
-  db_url: mysql://homeassistant:r1*snuG0F#6hgEb@core-mariadb/homeassistant?charset=utf8
+  db_url: !secret connectionstring_mariadb
 
 # Slack App
 notify:
@@ -30,6 +24,11 @@ notify:
     
 shelly:
 
+chargeamps:
+  username: !secret email_larre
+  password: !secret chargeamps_password
+  api_key: !secret chargeamps_api_key
+
 zone:
   - name: Home
     latitude: 55.693862
@@ -39,6 +38,7 @@ zone:
 
 # Discover some devices automatically
 discovery:
+
 
 # Sensors
 sensor:
@@ -52,9 +52,7 @@ sensor:
     - type: memory_use_percent
     - type: last_boot
     - type: processor_use
-  # SMHI Rain
-  - platform: Smhirain
-    station: '53430'
+
 
   # Swedish calendar
   - platform: swedish_calendar
