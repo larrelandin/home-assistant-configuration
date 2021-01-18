@@ -21,8 +21,6 @@ notify:
     default_channel: '#homeautomation'
     username: "Home Assistant"
     icon: ":octopus:"
-    
-shelly:
 
 chargeamps:
   username: !secret email_larre
