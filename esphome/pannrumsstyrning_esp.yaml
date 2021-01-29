@@ -21,7 +21,7 @@ logger:
 
 # Enable Home Assistant API
 api:
-   password: !secret esp_api_password
+  password: !secret esp_api_password
 
 ota:
   password: !secret esp_ota_password
@@ -50,8 +50,11 @@ sensor:
   - platform: homeassistant
     name: Outside temperature
     entity_id: sensor.ow_outside_temp
+#  - platform: homeassistant
+#    name: Furnace Heating
+#    entity_id: binary_sensor.furnace_heating_rising
 
-
+# Sensors
 binary_sensor:
   - platform: gpio
     pin:
@@ -62,7 +65,13 @@ binary_sensor:
   - platform: status
     name: "Pannrumsstyrning"
 
-# Values from Home Assistant
-  - platform: homeassistant
-    name: Furnace Heating
-    entity_id: binary_sensor.furnace_heating_rising
+#Switches
+switch:
+  - platform: gpio
+    name: "relay shunt open"
+    pin: GPIO13
+    id: relayshuntopen
+  - platform: gpio
+    name: "relay shunt close"
+    pin: GPIO14
+    id: relayshuntclose
