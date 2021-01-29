@@ -1,0 +1,74 @@
+ios:
+  actions:
+    - name: Goodnight House
+      background_color: "#000000"
+      label:
+        text: "Turns off all connected lights"
+        color: "#ff0000"
+      icon:
+        icon: lightbulb-group-off
+        color: "#ffffff"
+    - name: Courtesy on
+      background_color: "#000000"
+      label:
+        text: "Turns on courtesy lights"
+        color: "#ff0000"
+      icon:
+        icon: lightbulb
+        color: "#ffffff"
+    - name: Courtesy off
+      background_color: "#000000"
+      label:
+        text: "Turns off courtesy lights"
+        color: "#ff0000"
+      icon:
+        icon: lightbulb-off
+        color: "#ffffff"
+    - name: Interior on
+      background_color: "#000000"
+      label:
+        text: "Turns on interior lights"
+        color: "#ff0000"
+      icon:
+        icon: lightbulb
+        color: "#ffffff"
+    - name: Interior off
+      background_color: "#000000"
+      label:
+        text: "Turns off interior lights"
+        color: "#ff0000"
+      icon:
+        icon: lightbulb-off
+        color: "#ffffff"
+    - name: Downstairs on
+      background_color: "#000000"
+      label:
+        text: "Turns on downstairs lights"
+        color: "#ff0000"
+      icon:
+        icon: lightbulb
+        color: "#ffffff"
+    - name: Downstairs off
+      background_color: "#000000"
+      label:
+        text: "Turns off downstairs lights"
+        color: "#ff0000"
+      icon:
+        icon: lightbulb-off
+        color: "#ffffff"
+    - name: Upstairs on
+      background_color: "#000000"
+      label:
+        text: "Turns on upstairs lights"
+        color: "#ff0000"
+      icon:
+        icon: lightbulb
+        color: "#ffffff"
+    - name: Upstairs off
+      background_color: "#000000"
+      label:
+        text: "Turns off upstairs lights"
+        color: "#ff0000"
+      icon:
+        icon: lightbulb-off
+        color: "#ffffff"
