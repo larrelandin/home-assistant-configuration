@@ -1,6 +1,6 @@
 # https://github.com/newlund/HA-Engine_heater
 automation:
-  - alias: 'Start engine heater at calculated start time'
+  - alias: "Start engine heater at calculated start time"
     trigger:
       platform: time_pattern
       minutes: "/1"
@@ -11,16 +11,15 @@ automation:
         - condition: template
           value_template: '{{ now().time().strftime("%H:%M") == states.sensor.car_heater_start_time.state }}'
         - condition: template
-          value_template: '{{ states.sensor.car_heater_run_time.state|float > 0 }}'
+          value_template: "{{ states.sensor.car_heater_run_time.state|float > 0 }}"
         - condition: state
           entity_id: input_boolean.car_heater_enable
-          state: 'on'
+          state: "on"
     action:
       - service: switch.turn_on
-        entity_id: switch.engine_heater_relay
+        entity_id: switch.charge_amps_schuko
 
-
-  - alias: 'Stop engine heater at departure time'
+  - alias: "Stop engine heater at departure time"
     trigger:
       platform: time_pattern
       minutes: "/1"
@@ -31,18 +30,18 @@ automation:
         - condition: template
           value_template: '{{ now().time().strftime("%H:%M") == states.sensor.car_heater_actual_stop_time.state }}'
         - condition: template
-          value_template: '{{ states.sensor.car_heater_run_time.state|float > 0 }}'
+          value_template: "{{ states.sensor.car_heater_run_time.state|float > 0 }}"
         - condition: state
           entity_id: input_boolean.car_heater_enable
-          state: 'on'
+          state: "on"
     action:
       - service: switch.turn_off
-        entity_id: switch.engine_heater_relay
+        entity_id: switch.charge_amps_schuko
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.car_heater_enable
 
-  - alias: 'Sample temperature 3h before departure time'
+  - alias: "Sample temperature 3h before departure time"
     trigger:
       platform: time_pattern
       minutes: "/1"
@@ -54,67 +53,65 @@ automation:
           value_template: '{{ now().time().strftime("%H:%M") == states.sensor.car_heater_3h_before_start_time.state }}'
         - condition: state
           entity_id: input_boolean.car_heater_enable
-          state: 'on'
+          state: "on"
     action:
       service: input_number.set_value
       data_template:
         entity_id: input_number.car_heater_estimated_outside_temp
-        value: '{{ states.sensor.ow_outside_temp_rounded.state }}'
+        value: "{{ states.sensor.ow_outside_temp_rounded.state }}"
 
-  - alias: 'Turn on heater if manually started through override'
+  - alias: "Turn on heater if manually started through override"
     trigger:
       platform: state
       entity_id: input_boolean.car_heater_override
-      to: 'on'
+      to: "on"
     action:
       service: switch.turn_on
-      entity_id: switch.engine_heater_relay
+      entity_id: switch.charge_amps_schuko
 
-  - alias: 'Turn off heater if manually started after 1 hour'
+  - alias: "Turn off heater if manually started after 1 hour"
     trigger:
       platform: state
       entity_id: input_boolean.car_heater_override
-      to: 'on'
+      to: "on"
       for:
         minutes: 60
     action:
       service: input_boolean.turn_off
       entity_id: input_boolean.car_heater_override
 
-  - alias: 'Turn off heater if ovveride turns off'
+  - alias: "Turn off heater if ovveride turns off"
     trigger:
       platform: state
       entity_id: input_boolean.car_heater_override
-      to: 'off'
+      to: "off"
     action:
       service: switch.turn_off
-      entity_id: switch.engine_heater_relay
+      entity_id: switch.charge_amps_schuko
 
-  - alias: 'Car heater timer enabled'
+  - alias: "Car heater timer enabled"
     trigger:
       platform: state
       entity_id: input_boolean.car_heater_enable
-      to: 'on'
+      to: "on"
     action:
       service: input_number.set_value
       data_template:
         entity_id: input_number.car_heater_estimated_outside_temp
-        value: '{{ states.sensor.ow_outside_temp_rounded.state }}'
+        value: "{{ states.sensor.ow_outside_temp_rounded.state }}"
 
-  - alias: 'Car heater timer disabled'
+  - alias: "Car heater timer disabled"
     trigger:
       platform: state
       entity_id: input_boolean.car_heater_enable
-      to: 'off'
+      to: "off"
     condition:
       condition: state
       entity_id: input_boolean.car_heater_override
-      state: 'off'
+      state: "off"
     action:
       service: switch.turn_off
-      entity_id: switch.engine_heater_relay
-
-
+      entity_id: switch.charge_amps_schuko
 
 # Input sensors
 input_number:
@@ -146,24 +143,24 @@ input_boolean:
     name: Aktivera timer
   car_heater_override:
     name: "Forcera timer (1 timme)"
-    
+
 # Template sensors
 sensor:
   - platform: template
     sensors:
       car_heater_departure_time:
-        friendly_name: 'Tid för avfärd'
+        friendly_name: "Tid för avfärd"
         icon_template: mdi:clock
         value_template: >-
           {% if states('input_number.car_heater_hour')|int|string|length == 1 %}0{% endif -%}
           {{- states('input_number.car_heater_hour')|int|string -}}:
           {%- if states('input_number.car_heater_minutes')|int|string|length == 1 %}0{% endif -%}
           {{- states('input_number.car_heater_minutes')|int|string -}}
-          
+
   - platform: template
     sensors:
       car_heater_run_time:
-        friendly_name: 'Beräknad gångtid'
+        friendly_name: "Beräknad gångtid"
         unit_of_measurement: h
         value_template: >
           {% if ((states('input_number.car_heater_estimated_outside_temp')|float) < 10) %}
@@ -173,11 +170,11 @@ sensor:
           {%else%}
             0
           {%endif%}
-          
+
   - platform: template
     sensors:
       car_heater_start_time:
-        friendly_name: 'Beräknad starttid'
+        friendly_name: "Beräknad starttid"
         icon_template: mdi:clock
         value_template: >
           {% if states.sensor.car_heater_departure_time.state is defined %}
@@ -192,7 +189,7 @@ sensor:
   - platform: template
     sensors:
       car_heater_3h_before_start_time:
-        friendly_name: '3h before start time'
+        friendly_name: "3h before start time"
         icon_template: mdi:clock
         value_template: >
           {% if states.sensor.car_heater_departure_time.state is defined %}
@@ -203,14 +200,14 @@ sensor:
   - platform: template
     sensors:
       car_heater_actual_stop_time:
-        friendly_name: 'Faktisk stopptid (+15 min)'
+        friendly_name: "Faktisk stopptid (+15 min)"
         icon_template: mdi:clock
         value_template: >
-         {{ strptime((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) + (float ( 15*60 )))|timestamp_local, '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
+          {{ strptime((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) + (float ( 15*60 )))|timestamp_local, '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
 binary_sensor:
   - platform: template
     sensors:
       engine_heater_on:
         friendly_name: "Motorvärmare status"
         device_class: heat
-        value_template: "{{ is_state('switch.engine_heater_relay', 'on') }}"
+        value_template: "{{ is_state('switch.charge_amps_schuko', 'on') }}"
