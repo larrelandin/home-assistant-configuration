@@ -3,6 +3,13 @@ esphome:
   platform: ESP32
   board: esp32-poe
 
+  #Start automation script
+  on_boot:
+    priority: -10
+    then:
+      - script.execute: shunt_automation
+
+
 ethernet:
   type: LAN8720
   mdc_pin: GPIO23
@@ -34,6 +41,9 @@ globals:
   - id: shunt_time_seconds
     type: int
     initial_value: '3'
+  - id: shunt_pause_time_seconds
+    type: int
+    initial_value: '10'
   - id: heating_tolerance_degrees
     type: int
     initial_value: '3'
@@ -49,14 +59,19 @@ sensor:
   - platform: dallas
     address: 0x310119143EF32B28
     name: Panntemperatur
+    id: furnace_temp
+    internal: true
   - platform: dallas
     address: 0xDD0119142F965B28
-    name: Framledningstemperatur
+    id: flow_temperature
+    internal: true
   - platform: template
-    name: "Calculated flow temperature"
+    id: setpoint_flow_temperature
+    name: "Börvärde framledning"
     lambda: |-
-      return id(heating_curve).state * (-1) * id(outside_temp).state + id(heating_offset).state;
+      return (id(heating_curve).state * (-1) * id(outside_temp).state) + id(heating_offset).state;
     update_interval: 1min
+    internal: true
     
     # Values from Home Assistant
   - platform: homeassistant
@@ -96,15 +111,46 @@ switch:
     name: "relay shunt open"
     pin: GPIO13
     id: relayshuntopen
+    internal: true
   - platform: gpio
     name: "relay shunt close"
     pin: GPIO14
     id: relayshuntclose
+    internal: true
   - platform: gpio
     name: "relay burner thermostat"
     pin: GPIO15
     id: relayburnerthermostat
+    internal: true
   - platform: gpio
     name: "relay circulation pump"
     pin: GPIO16
     id: relaycirculationpump
+    internal: true
+
+#Scripts
+script:
+  id: shunt_automation
+  mode: single
+  then:
+  - while:
+      condition:
+        lambda: 'return 1;'
+      then:
+        - logger.log: "Shunt running"
+        - delay: 10s
+        # - if:
+        #     condition:
+        #       lambda: 'return ((float)id(furnace_temp).state + (float)id(flow_temperature).state) > 0.0;'
+        #     then:
+        #       - logger.log: "Test"
+        - if: # Shunta upp  50-3 > framledning
+            condition:
+              lambda: 'return (float)id(setpoint_flow_temperature).state - id(heating_tolerance_degrees) > (float)id(flow_temperature).state;'
+            then:
+              - logger.log: "Shuntar upp"
+        - if:
+            condition:
+              lambda: 'return (float)id(setpoint_flow_temperature).state + id(heating_tolerance_degrees) < (float)id(flow_temperature).state ;'
+            then:
+                - logger.log: "Shuntar ned"
