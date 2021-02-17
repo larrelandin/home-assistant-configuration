@@ -4,4 +4,6 @@ sensor:
       charge_amps_total_consumption_kwh:
         friendly_name: Total Consumption kWh
         value_template: >-
-          {{ state_attr('sensor.charge_amps_charging_status', 'total_consumption_kwh') }}
+          {% if state_attr('sensor.charge_amps_charging_status', 'total_consumption_kwh') > 0 %}
+            {{ state_attr('sensor.charge_amps_charging_status', 'total_consumption_kwh') }}
+          {% endif %}
