@@ -1,9 +1,17 @@
 sensor:
-  - platform: template
-    sensors:
-      charge_amps_total_consumption_kwh:
-        friendly_name: Total Consumption kWh
-        value_template: >-
-          {% if state_attr('sensor.charge_amps_charging_status', 'total_consumption_kwh') > 0 %}
-            {{ state_attr('sensor.charge_amps_charging_status', 'total_consumption_kwh') }}
-          {% endif %}
+  - platform: sql
+    db_url: mysql://homeassistant:r1*snuG0F#6hgEb@core-mariadb/homeassistant
+    queries:
+      - name: charge_amps_total_consumption_latest_charge_kwh
+        query: "SELECT JSON_EXTRACT((SELECT `attributes` FROM `states` WHERE `entity_id` = 'sensor.charge_amps_charging_status' AND `state` = 'charging' ORDER BY `last_updated` DESC LIMIT 1), '$.total_consumption_kwh') AS 'Consumption';"
+        column: "Consumption"
+        unit_of_measurement: kWh
+# sensor:
+#   - platform: template
+#     sensors:
+#       charge_amps_total_consumption_kwh:
+#         friendly_name: Total Consumption kWh
+#         value_template: >-
+#           {% if state_attr('sensor.charge_amps_charging_status', 'total_consumption_kwh') > 0 %}
+#             {{ state_attr('sensor.charge_amps_charging_status', 'total_consumption_kwh') }}
+#           {% endif %}
