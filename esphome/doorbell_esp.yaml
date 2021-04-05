@@ -1,0 +1,95 @@
+esphome:
+  name: doorbell_esp
+  platform: ESP8266
+  board: esp01_1m
+
+wifi:
+  ssid: 'landin iot'
+  password: !secret landin_iot_wifi_password
+  domain: '.landin.lan'
+  fast_connect: true
+  
+  manual_ip:
+    static_ip: 192.168.10.63
+    gateway: 192.168.10.1
+    subnet: 255.255.255.0
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Doorbell Esp Fallback Hotspot"
+    password: "etGKtacmiVCE"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret esp_api_password
+
+ota:
+  password: !secret esp_ota_password
+
+# Global to store the on/off state of the chime
+globals:
+  - id: chime
+    type: bool
+    restore_value: true
+    initial_value: 'true'
+
+# Exposed switches.
+switch:
+  # Switch to turn on/off the chime.
+  - platform: gpio
+    id: relay
+    inverted: false
+    name: Doorbell Chime
+    pin: GPIO0
+
+  # Switch to turn on/off chime when
+  # doorbell button is pushed.
+  #
+  # It creates a "virtual" switch based
+  # on a global variable.
+  - platform: template
+    name: Doorbell Chime Active
+    id: chime_active
+    restore_state: false
+    turn_on_action:
+      - globals.set:
+          id: chime
+          value: 'true'
+    turn_off_action:
+      - globals.set:
+          id: chime
+          value: 'false'
+    lambda: |-
+      return id(chime);
+
+# Binary sensor representing the
+# Doorbell button push.
+binary_sensor:
+  - platform: gpio
+    id: button
+    name: Doorbell Button
+    pin:
+      # Connected to GPIO on the ESP-01S.
+      number: GPIO2
+      mode: INPUT_PULLUP
+      inverted: true
+    filters:
+      # Small filter, to debounce the button press.
+      - delayed_on: 25ms
+      - delayed_off: 25ms
+    on_press:
+      # Only turn on the chime when it is active.
+      then:
+        if:
+          condition:
+            - switch.is_on: chime_active
+          then:
+            - switch.turn_on: relay
+    on_release:
+      # On release, turn of the chime.
+      - switch.turn_off: relay
