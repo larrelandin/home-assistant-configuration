@@ -1,0 +1,15 @@
+sensor:
+  - platform: resrobot
+    fetch_interval: 30
+    key: !secret trafiklab
+    departures:
+      - stop_id: 740072471
+        name: "Buss till Botulfsplatsen"
+        max_journeys: 20
+        sensors: 3
+        unit: "🕑"
+        filter:
+          - line: 5
+            direction: "Lund Företagsvägen"
+          - line: 5
+            direction: "Lund Bondevägen"
