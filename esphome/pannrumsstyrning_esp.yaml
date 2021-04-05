@@ -99,7 +99,7 @@ binary_sensor:
       inverted: True
     name: "burner error"
   - platform: status
-    name: "Pannrumsstyrning"
+    name: "Pannrumsstyrning ESP status"
   - platform: homeassistant
     name: Furnace Heating
     entity_id: binary_sensor.furnace_heating_rising

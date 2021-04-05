@@ -40,4 +40,4 @@ sensor:
 
 binary_sensor:
   - platform: status
-    name: "Jordkällare"
+    name: "Jordkällare ESP status"
