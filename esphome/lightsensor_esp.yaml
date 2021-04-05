@@ -47,3 +47,9 @@ sensor:
     - exponential_moving_average:
         alpha: 0.1
         send_every: 10
+
+switch:
+  - platform: gpio
+    pin: D1
+    id: red_led
+    name: "Red LED"
