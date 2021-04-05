@@ -14,26 +14,19 @@ wifi:
     gateway: 192.168.10.1
     subnet: 255.255.255.0
 
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    ssid: "Lightsensor Esp Fallback Hotspot"
-    password: "AfKzGFsMB3n1"
-
-captive_portal:
-
 # Enable logging
 logger:
 
 # Enable Home Assistant API
 api:
-   password: !secret esp_api_password
+  password: !secret esp_api_password
 
 ota:
   password: !secret esp_ota_password
 
 binary_sensor:
   - platform: status
-    name: "Poolhus"
+    name: "Lightsensor ESP"
 
 sensor:
   - platform: adc 
