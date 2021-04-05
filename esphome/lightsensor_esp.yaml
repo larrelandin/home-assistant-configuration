@@ -26,7 +26,7 @@ ota:
 
 binary_sensor:
   - platform: status
-    name: "Lightsensor ESP"
+    name: "Lightsensor ESP status"
 
 sensor:
   - platform: adc 
