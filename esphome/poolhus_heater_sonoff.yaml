@@ -1,5 +1,5 @@
 esphome:
-  name: poolhus_sonoff
+  name: poolhus_heater_sonoff
   platform: ESP8266
   board: esp01_1m
 
@@ -13,13 +13,6 @@ wifi:
     static_ip: 192.168.10.64
     gateway: 192.168.10.1
     subnet: 255.255.255.0
-
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    ssid: "PoolHouse Fallback Hotspot"
-    password: "NVTMTPl6Ewuk"
-
-captive_portal:
 
 # Enable logging
 logger:
