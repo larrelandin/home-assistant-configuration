@@ -42,4 +42,19 @@ sensor:
       unit_of_measurement: "%"
     update_interval: 60s
 
-
+switch:
+  - platform: gpio
+    pin: D1
+    id: red_led
+    name: "Red LED"
+  - platform: gpio
+    pin: D3
+    id: buzzer
+    restore_mode: ALWAYS_OFF
+  - platform: template
+    name: "Beep buzzer"
+    icon: "mdi:bullhorn"
+    turn_on_action:
+    - switch.turn_on: buzzer
+    - delay: 500ms
+    - switch.turn_off: buzzer
