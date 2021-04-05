@@ -7,3 +7,4 @@ climate:
       minutes: 3
     min_temp: 3
     max_temp: 25
+    precision: 1.0
