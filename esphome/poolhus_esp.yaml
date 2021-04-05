@@ -44,10 +44,6 @@ sensor:
 
 switch:
   - platform: gpio
-    pin: D1
-    id: red_led
-    name: "Red LED"
-  - platform: gpio
     pin: D3
     id: buzzer
     restore_mode: ALWAYS_OFF
