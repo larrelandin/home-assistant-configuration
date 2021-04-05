@@ -139,12 +139,7 @@ script:
       then:
         - logger.log: "Shunt running"
         - delay: 10s
-        # - if:
-        #     condition:
-        #       lambda: 'return ((float)id(furnace_temp).state + (float)id(flow_temperature).state) > 0.0;'
-        #     then:
-        #       - logger.log: "Test"
-        - if: # Shunta upp  50-3 > framledning
+        - if:
             condition:
               lambda: 'return (float)id(setpoint_flow_temperature).state - id(heating_tolerance_degrees) > (float)id(flow_temperature).state;'
             then:
