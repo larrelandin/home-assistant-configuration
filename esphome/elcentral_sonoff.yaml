@@ -33,7 +33,7 @@ ota:
 
 binary_sensor:
   - platform: status
-    name: "ESP Elcentral status"
+    name: "Elcentral Sonoff status"
   
 output:
   - platform: gpio

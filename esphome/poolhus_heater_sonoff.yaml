@@ -37,7 +37,7 @@ binary_sensor:
         - delay: 1h
         - switch.turn_off: relay1
   - platform: status
-    name: "pool house heater ESP status"
+    name: "Poolhus Värmare Sonoff status"
 
 switch:
   - platform: gpio

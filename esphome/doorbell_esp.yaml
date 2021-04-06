@@ -94,4 +94,4 @@ binary_sensor:
       # On release, turn of the chime.
       - switch.turn_off: relay
   - platform: status
-    name: "ESP Doorbell status"
+    name: "Doorbell ESP status"

@@ -26,7 +26,7 @@ ota:
 
 binary_sensor:
   - platform: status
-    name: "Poolhus"
+    name: "Poolhus ESP status"
 
 # DHT11
 sensor:
