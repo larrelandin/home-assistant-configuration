@@ -1,7 +1,13 @@
 esphomedevices:
   name: ESP Home enheter status
+  all: true
   entities:
-    - binary_sensor.pannrum_status
-    - binary_sensor.poolhus_status
-    - binary_sensor.engine_heater_status
-    - binary_sensor.pool_house_status
+    - binary_sensor.pannrum_esp_status
+    - binary_sensor.pannrumsstyrning_esp_status
+    - binary_sensor.poolhus_esp_status
+    - binary_sensor.poolhus_hornlampor_sonoff_status
+    - binary_sensor.poolhus_varmare_sonoff_status
+    - binary_sensor.jordkallare_esp_status
+    - binary_sensor.lightsensor_esp_status
+    - binary_sensor.doorbell_esp_status
+    - binary_sensor.elcentral_sonoff_status
