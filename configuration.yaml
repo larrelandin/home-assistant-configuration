@@ -12,13 +12,14 @@ default_config:
 
 recorder:
   db_url: !secret connectionstring_mariadb
+  purge_keep_days: 30
 
 # Slack App
 notify:
   - name: slack_notify
     platform: slack
     api_key: !secret slack_api_key
-    default_channel: '#homeautomation'
+    default_channel: "#homeautomation"
     username: "Home Assistant"
     icon: ":octopus:"
 
@@ -37,24 +38,22 @@ zone:
 # Discover some devices automatically
 discovery:
 
-
 # Sensors
 sensor:
   ### system monitor ###
   - platform: systemmonitor
     resources:
-    - type: disk_use_percent
-      arg: /
-    - type: disk_free
-      arg: /
-    - type: memory_use_percent
-    - type: last_boot
-    - type: processor_use
-
+      - type: disk_use_percent
+        arg: /
+      - type: disk_free
+        arg: /
+      - type: memory_use_percent
+      - type: last_boot
+      - type: processor_use
 
   # Swedish calendar
   - platform: swedish_calendar
-    
+
 # IOS App settings
 ios:
 
@@ -69,9 +68,7 @@ shopping_list:
 
 logger:
   default: warn
-  
+
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
-
-
