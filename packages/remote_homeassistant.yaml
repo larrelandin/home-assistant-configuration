@@ -1,0 +1,8 @@
+remote_homeassistant:
+  instances:
+    - host: solarbridge.landin.lan
+      port: 8123
+      access_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI2MjcyMjkwY2UwMmI0N2Q1ODRhYTJiZGE5ZTY0NTZhZCIsImlhdCI6MTYzMjQwMTc4NCwiZXhwIjoxOTQ3NzYxNzg0fQ._RFAp6AqET1NYmFtGLahi6zfVR2YrLlGKm_V_S5c2Sk
+      include:
+        entities:
+          - sensor.sun2000_10ktl_m1
