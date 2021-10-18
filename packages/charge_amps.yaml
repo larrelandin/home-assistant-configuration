@@ -1,11 +1,16 @@
 sensor:
   - platform: sql
-    db_url: mysql://homeassistant:r1*snuG0F#6hgEb@core-mariadb/homeassistant
+    db_url: !secret connectionstring_mariadb
     queries:
       - name: charge_amps_total_consumption_latest_charge_kwh
         query: "SELECT JSON_EXTRACT((SELECT `attributes` FROM `states` WHERE `entity_id` = 'sensor.charge_amps_charging_status' AND `state` = 'charging' ORDER BY `last_updated` DESC LIMIT 1), '$.total_consumption_kwh') AS 'Consumption';"
         column: "Consumption"
         unit_of_measurement: kWh
+
+utility_meter:
+  charge_amps_daily_charges:
+    source: sensor.charge_amps_total_consumption_latest_charge_kwh
+    cycle: daily
 # sensor:
 #   - platform: template
 #     sensors:
