@@ -1,0 +1,153 @@
+# Note that this integration is dependent on the remote_homeassistant integration as the sensors are coming from that remote HA instance
+
+sensor solar:
+  - platform: template
+    sensors:
+      pv_input_power:
+        friendly_name: "DC Production"
+        #entity_id: sensor.sun2000_10ktl_m1
+        unit_of_measurement: "W"
+        icon_template: mdi:solar-power
+        value_template: "{{ state_attr('sensor.sun2000_10ktl_m1', 'input_power') }}"
+
+  - platform: template
+    sensors:
+      pv_daily_yield:
+        friendly_name: "Daily Yield"
+        #entity_id: sensor.sun2000_10ktl_m1
+        unit_of_measurement: "kWh"
+        device_class: energy
+        icon_template: mdi:solar-power
+        value_template: "{{ state_attr('sensor.sun2000_10ktl_m1', 'daily_yield') }}"
+
+  # - platform: template
+  #   sensors:
+  #     grid_exported_energy:
+  #       friendly_name: "grid exported energy"
+  #       #entity_id: sensor.sun2000_10ktl_m1
+  #       unit_of_measurement: "kWh"
+  #       icon_template: mdi:transmission-tower
+  #       value_template: "{{ state_attr('sensor.sun2000_10ktl_m1', 'grid_exported_energy') }}"
+
+  # - platform: template
+  #   sensors:
+  #     energy_used_by_house:
+  #       friendly_name: "energy used by house"
+  #       #entity_id: sensor.sun2000_10ktl_m1
+  #       unit_of_measurement: "kWh"
+  #       icon_template: mdi:transmission-tower
+  #       value_template: "{{ state_attr('sensor.sun2000_10ktl_m1', 'grid_accumulated_energy') }}"
+
+# sensor total:
+#   - platform: template
+#     sensors:
+#       pv_total_yield:
+#         friendly_name: "Total Yield"
+#         unit_of_measurement: "kWh"
+#         icon_template: mdi:solar-power
+#         value_template: "{{ state_attr('sensor.sun2000_10ktl_m1', 'total_yield') }}"
+#         device_class: energy
+
+template:
+  - sensor:
+    - name: "pv_total_yield"
+      unit_of_measurement: "kWh"
+      state_class: measurement
+      device_class: energy
+      icon: mdi:solar-power
+      state: "{{ state_attr('sensor.sun2000_10ktl_m1', 'total_yield') }}"
+      attributes:
+        last_reset: '1970-01-01T00:00:00+00:00'
+
+
+      # energy_used:
+      #   friendly_name: "total energy used"
+      #   unit_of_measurement: "kWh"
+      #   value_template: >
+      #     {{ '%0.2f' | format(states('sensor.total_yield') | float - states('sensor.grid_exporterd_energy') | float + states('sensor.grid_accumulated_energy') | float) }}
+
+  - platform: template
+    sensors:
+      pv_string_01_voltage:
+        friendly_name: "Pv String 01 Voltage"
+        #entity_id: sensor.sun2000_10ktl_m1
+        unit_of_measurement: "V"
+        icon_template: mdi:solar-power
+        value_template: "{{ state_attr('sensor.sun2000_10ktl_m1', 'pv_string_01_voltage') }}"
+
+  - platform: template
+    sensors:
+      pv_string_01_current:
+        friendly_name: "PV String 01 Current"
+        #entity_id: sensor.sun2000_10ktl_m1
+        unit_of_measurement: "A"
+        icon_template: mdi:solar-power
+        value_template: "{{ state_attr('sensor.sun2000_10ktl_m1', 'pv_string_01_current') }}"
+
+  - platform: template
+    sensors:
+      pv_string_02_voltage:
+        friendly_name: "PV String 02 Voltage"
+        #entity_id: sensor.sun2000_10ktl_m1
+        unit_of_measurement: "V"
+        icon_template: mdi:solar-power
+        value_template: "{{ state_attr('sensor.sun2000_10ktl_m1', 'pv_string_02_voltage') }}"
+
+  - platform: template
+    sensors:
+      pv_string_02_current:
+        friendly_name: "PV String 02 Current"
+        #entity_id: sensor.sun2000_10ktl_m1
+        unit_of_measurement: "A"
+        icon_template: mdi:solar-power
+        value_template: "{{ state_attr('sensor.sun2000_10ktl_m1', 'pv_string_02_current') }}"
+
+  # - platform: template
+  #   sensors:
+  #     pv_active_power:
+  #       friendly_name: "Power Meter Active Power"
+  #       #entity_id: sensor.sun2000_10ktl_m1
+  #       unit_of_measurement: "kW"
+  #       icon_template: mdi:solar-power
+  #       value_template: "{{ state_attr('sensor.sun2000_10ktl_m1', 'power_meter_active_power') | float / 1000|round(2)  }}"
+
+  - platform: template
+    sensors:
+      consumption:
+        friendly_name: "Consumption"
+        unit_of_measurement: "kW"
+        icon_template: mdi:solar-power
+        value_template: '{{ states("sensor.sun2000_10ktl_m1") |float - states("sensor.pv_active_power") | float }}'
+
+  - platform: template
+    sensors:
+      pv_device_status:
+        friendly_name: "Device Status"
+        #entity_id: sensor.sun2000_10ktl_m1
+        icon_template: mdi:solar-power
+        value_template: "{{ state_attr('sensor.sun2000_10ktl_m1', 'device_status') }}"
+
+  - platform: template
+    sensors:
+      pv_string_02_power:
+        friendly_name: "PV String 02 Power"
+        unit_of_measurement: "kW"
+        icon_template: mdi:solar-power
+        value_template: '{{ states("sensor.pv_string_02_voltage") |float * states("sensor.pv_string_02_current") | float / 1000|round(2) }}'
+
+  - platform: template
+    sensors:
+      pv_string_01_power:
+        friendly_name: "PV String 01 Power"
+        unit_of_measurement: "kW"
+        icon_template: mdi:solar-power
+        value_template: '{{ states("sensor.pv_string_01_voltage") |float * states("sensor.pv_string_01_current") | float / 1000|round(2) }}'
+
+  - platform: template
+    sensors:
+      pv_efficiency:
+        friendly_name: "Solar Efficiency"
+        #entity_id: sensor.sun2000_10ktl_m1
+        unit_of_measurement: "%"
+        icon_template: mdi:solar-power
+        value_template: "{{ state_attr('sensor.sun2000_10ktl_m1', 'efficiency') }}"
