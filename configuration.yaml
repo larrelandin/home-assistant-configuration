@@ -65,19 +65,19 @@ sensor:
 # IOS App settings
 ios:
 
-device_tracker:
-  - platform: luci
-    host: 192.168.10.1
-    username: root
-    password: !secret router_password
-    consider_home: 240
+# device_tracker:
+#   - platform: luci
+#     host: 192.168.10.1
+#     username: root
+#     password: !secret router_password
+#     consider_home: 240
 
 shopping_list:
 
 logger:
   default: info
-  logs:
-    custom_components.fusion_solar_kiosk: debug
+  # logs:
+  #   custom_components.fusion_solar_kiosk: debug
 
 group: !include groups.yaml
 automation: !include automations.yaml
