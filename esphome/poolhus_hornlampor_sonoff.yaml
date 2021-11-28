@@ -1,5 +1,5 @@
 esphome:
-  name: poolhus_hornlampor_sonoff
+  name: poolhus-hornlampor-sonoff
   platform: ESP8266
   board: esp01_1m
 

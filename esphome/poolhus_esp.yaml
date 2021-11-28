@@ -1,5 +1,5 @@
 esphome:
-  name: poolhus_esp
+  name: poolhus-esp
   platform: ESP8266
   board: nodemcuv2
 

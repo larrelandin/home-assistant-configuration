@@ -1,5 +1,5 @@
 esphome:
-  name: pool_lights_sonoff
+  name: pool-lights-sonoff
   platform: ESP8266
   board: esp01_1m
 

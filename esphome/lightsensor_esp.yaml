@@ -1,5 +1,5 @@
 esphome:
-  name: lightsensor_esp
+  name: lightsensor-esp
   platform: ESP8266
   board: nodemcuv2
 

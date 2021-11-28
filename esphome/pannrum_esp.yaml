@@ -1,5 +1,5 @@
 esphome:
-  name: pannrum_esp
+  name: pannrum-esp
   platform: ESP8266
   board: nodemcuv2
 

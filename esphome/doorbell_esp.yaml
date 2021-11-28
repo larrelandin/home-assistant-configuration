@@ -1,5 +1,5 @@
 esphome:
-  name: doorbell_esp
+  name: doorbell-esp
   platform: ESP8266
   board: esp01_1m
 
