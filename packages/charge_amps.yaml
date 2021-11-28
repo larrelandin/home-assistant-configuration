@@ -11,12 +11,3 @@ utility_meter:
   charge_amps_daily_charges:
     source: sensor.charge_amps_total_consumption_latest_charge_kwh
     cycle: daily
-# sensor:
-#   - platform: template
-#     sensors:
-#       charge_amps_total_consumption_kwh:
-#         friendly_name: Total Consumption kWh
-#         value_template: >-
-#           {% if state_attr('sensor.charge_amps_charging_status', 'total_consumption_kwh') > 0 %}
-#             {{ state_attr('sensor.charge_amps_charging_status', 'total_consumption_kwh') }}
-#           {% endif %}
