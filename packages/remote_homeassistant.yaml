@@ -1,0 +1,11 @@
+remote_homeassistant:
+  instances:
+    - host: 192.168.10.6
+      port: 8123
+      access_token: !secret remote_solarbridge_token
+      entity_prefix: "solarbridge_"
+      include:
+        entities:
+          - sensor.sun2000_10ktl_m1
+          - sensor.daily_yield
+          - sensor.total_yield
