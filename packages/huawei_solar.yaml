@@ -5,14 +5,14 @@ template:
       - name: "pv_input_power"
         unit_of_measurement: "W"
         icon: mdi:solar-power
-        state: "{{ state_attr('sensor.sun2000_10ktl_m1', 'input_power') }}"
+        state: "{{ state_attr('sensor.solarbridge_sun2000_10ktl_m1', 'input_power') }}"
 
   - sensor:
       - name: "pv_daily_yield"
         unit_of_measurement: "kWh"
         device_class: energy
         icon: mdi:solar-power
-        state: "{{ state_attr('sensor.sun2000_10ktl_m1', 'daily_yield') }}"
+        state: "{{ states('sensor.solarbridge_daily_yield') }}"
 
   - sensor:
       - name: "pv_total_yield"
@@ -20,7 +20,7 @@ template:
         state_class: measurement
         device_class: energy
         icon: mdi:solar-power
-        state: "{{ state_attr('sensor.sun2000_10ktl_m1', 'total_yield') }}"
+        state: "{{ states('sensor.solarbridge_total_yield') }}"
         attributes:
           last_reset: "1970-01-01T00:00:00+00:00"
 
@@ -28,41 +28,41 @@ template:
       - name: "pv_string_01_voltage"
         unit_of_measurement: "V"
         icon: mdi:solar-power
-        state: "{{ state_attr('sensor.sun2000_10ktl_m1', 'pv_string_01_voltage') }}"
+        state: "{{ state_attr('sensor.solarbridge_sun2000_10ktl_m1', 'pv_string_01_voltage') }}"
 
   - sensor:
       - name: "pv_string_01_current"
         unit_of_measurement: "A"
         icon: mdi:solar-power
-        state: "{{ state_attr('sensor.sun2000_10ktl_m1', 'pv_string_01_current') }}"
+        state: "{{ state_attr('sensor.solarbridge_sun2000_10ktl_m1', 'pv_string_01_current') }}"
 
   - sensor:
       - name: "pv_string_02_voltage"
         unit_of_measurement: "V"
         icon: mdi:solar-power
-        state: "{{ state_attr('sensor.sun2000_10ktl_m1', 'pv_string_02_voltage') }}"
+        state: "{{ state_attr('sensor.solarbridge_sun2000_10ktl_m1', 'pv_string_02_voltage') }}"
 
   - sensor:
       - name: "pv_string_02_current"
         unit_of_measurement: "A"
         icon: mdi:solar-power
-        state: "{{ state_attr('sensor.sun2000_10ktl_m1', 'pv_string_02_current') }}"
+        state: "{{ state_attr('sensor.solarbridge_sun2000_10ktl_m1', 'pv_string_02_current') }}"
 
   - sensor:
       - name: "pv_active_power"
         unit_of_measurement: "kW"
         icon: mdi:solar-power
-        state: "{{ state_attr('sensor.sun2000_10ktl_m1', 'power_meter_active_power') }}"
+        state: "{{ state_attr('sensor.solarbridge_sun2000_10ktl_m1', 'power_meter_active_power') }}"
   - sensor:
       - name: "consumption"
         unit_of_measurement: "kW"
         icon: mdi:solar-power
-        state: "{{ states('sensor.sun2000_10ktl_m1') |float - states('sensor.pv_active_power') | float }}"
+        state: "{{ states('sensor.solarbridge_sun2000_10ktl_m1') |float - states('sensor.pv_active_power') | float }}"
 
   - sensor:
       - name: "pv_device_status"
         icon: mdi:solar-power
-        state: "{{ state_attr('sensor.sun2000_10ktl_m1', 'device_status') }}"
+        state: "{{ state_attr('sensor.solarbridge_sun2000_10ktl_m1', 'device_status') }}"
 
   - sensor:
       - name: "pv_string_02_power"
@@ -80,4 +80,4 @@ template:
       - name: "pv_efficiency"
         unit_of_measurement: "%"
         icon: mdi:solar-power
-        state: "{{ state_attr('sensor.sun2000_10ktl_m1', 'efficiency') }}"
+        state: "{{ state_attr('sensor.solarbridge_sun2000_10ktl_m1', 'efficiency') }}"
