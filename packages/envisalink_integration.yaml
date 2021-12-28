@@ -12,72 +12,72 @@ envisalink:
   panic_type: Police
   zones:
     1:
-      name: 'IR Kök'
-      type: 'motion'
+      name: "IR Kök"
+      type: "motion"
     2:
-      name: 'IR Gästrum'
-      type: 'motion'
+      name: "IR Gästrum"
+      type: "motion"
     3:
-      name: 'Rökdetektor'
-      type: 'smoke'
+      name: "Rökdetektor"
+      type: "smoke"
     4:
-      name: 'Låsbrytare framsida'
-      type: 'lock'
+      name: "Låsbrytare framsida"
+      type: "lock"
     5:
-      name: 'Fönster tak sydost'
-      type: 'window'
+      name: "Fönster tak sydost"
+      type: "window"
     6:
-      name: 'Fönster tak sydväst'
-      type: 'window'
+      name: "Fönster tak sydväst"
+      type: "window"
     7:
-      name: 'Fönster Gästrum'
-      type: 'window'
+      name: "Fönster Gästrum"
+      type: "window"
     9:
-      name: 'IR Hall'
-      type: 'motion'
+      name: "IR Hall"
+      type: "motion"
     10:
-      name: 'IR Vardagsrum'
-      type: 'motion'
+      name: "IR Vardagsrum"
+      type: "motion"
     11:
-      name: 'Fönster tak toa'
-      type: 'window'
+      name: "Fönster tak toa"
+      type: "window"
     12:
-      name: 'Fönster tak hall'
-      type: 'window'
-    13: 
-      name: 'Fönster tak badrum'
-      type: 'window'
+      name: "Fönster tak hall"
+      type: "window"
+    13:
+      name: "Fönster tak badrum"
+      type: "window"
     14:
-      name: 'IR Bibliotek'
-      type: 'motion'
+      name: "IR Bibliotek"
+      type: "motion"
     15:
-      name: 'IR Hall ovanvåning'
-      type: 'motion'
+      name: "IR Hall ovanvåning"
+      type: "motion"
     16:
-      name: 'Fönster norra gaveln'
-      type: 'window'
+      name: "Fönster norra gaveln"
+      type: "window"
     17:
-      name: 'Fönster TV rum'
-      type: 'window'
+      name: "Fönster TV rum"
+      type: "window"
     49:
-      name: 'Dörr Gästingång'
-      type: 'door'
+      name: "Dörr Gästingång"
+      type: "door"
     50:
-      name: 'Dörr Kök'
-      type: 'door'
+      name: "Dörr Kök"
+      type: "door"
     51:
-      name: 'Dörr Framsida'
-      type: 'door'
+      name: "Dörr Framsida"
+      type: "door"
 
   partitions:
     1:
-      name: 'Huset'
+      name: "Huset"
     2:
-      name: 'Gästzon'
+      name: "Gästzon"
 
 group:
   motion_all_house:
-    name: 'Rörelse hela huset'
+    name: "Rörelse hela huset"
     entities:
       - binary_sensor.ir_kok
       - binary_sensor.ir_gastrum
@@ -87,14 +87,14 @@ group:
       - binary_sensor.ir_hall_ovanvaning
 
   doors:
-    name: 'Ytterdörrar'
+    name: "Ytterdörrar"
     entities:
       - binary_sensor.dorr_framsida
       - binary_sensor.dorr_gastingang
       - binary_sensor.dorr_kok
 
   windows:
-    name: 'Fönster'
+    name: "Fönster"
     entities:
       - binary_sensor.fonster_tv_rum
       - binary_sensor.fonster_norra_gaveln
@@ -104,3 +104,51 @@ group:
       - binary_sensor.fonster_tak_toa
       - binary_sensor.fonster_tak_sydost
       - binary_sensor.fonster_tak_sydvast
+
+template:
+  sensors:
+    template_last_motion:
+      friendly_name: "Last motion"
+      icon_template: "mdi:walk"
+      value_template: >
+        {% set allmotion = states | selectattr('entity_id', 'in', state_attr('group.motion_all_house', 'entity_id')) | list %}
+        {% set open= allmotion | map(attribute='last_changed') | list |max %}
+        {% set timedifference = (as_timestamp(now()) - as_timestamp(open)) %}
+        {% set days = (timedifference / 86400) | int %}
+        {% set hours = ((timedifference % 86400) / 3600) | int %}
+        {% set minutes = ((timedifference % 3600) / 60) | int %}
+        {% set seconds = (timedifference % 60) | int %}
+        Rörelse {{allmotion |selectattr('last_changed','eq', open)|map(attribute='name')|list|join}}
+        {{ ' för ' }}
+        {%- if timedifference < 60 -%} mindre än en minut
+        {%- else -%}
+          {%- if days == 1 -%}
+            {{ '1 dag' }}
+          {%- endif -%}
+          {%- if days > 1 -%}
+            {{ days }} dagar
+          {%- endif -%}
+          {%- if hours > 0 -%}
+            {%- if days > 0 -%}
+              {{ ' ' }}
+            {%- endif -%}
+            {%- if hours == 1 -%}
+              {{ '1 timme'}}
+            {%- endif -%}
+            {%- if hours > 1 -%}
+              {{ hours }} timme
+            {%- endif -%}
+          {%- endif -%}
+          {%- if minutes > 0 -%}
+            {%- if days > 0 or hours > 0 -%}
+              {{ ' ' }}
+            {%- endif -%}
+            {%- if minutes == 1 -%}
+              {{ '1 minut' }} 
+            {%- endif -%}
+            {%- if minutes > 1 -%}
+              {{ minutes }} minuter
+            {%- endif -%}
+          {%- endif -%}
+        {%- endif -%} 
+        {{ ' sedan'}}
