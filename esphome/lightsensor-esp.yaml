@@ -48,8 +48,19 @@ sensor:
         alpha: 0.1
         send_every: 10
 
+  - platform: bh1750
+    name: "BH1750 Illuminance"
+    address: 0x23
+    update_interval: 30s
+
+i2c:
+  sda: D2
+  scl: D1
+  scan: true
+  id: bus_a
+
 switch:
   - platform: gpio
-    pin: D1
+    pin: D4
     id: red_led
     name: "Red LED"
