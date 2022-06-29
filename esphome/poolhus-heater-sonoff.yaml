@@ -30,7 +30,8 @@ binary_sensor:
       number: GPIO0
       mode: INPUT_PULLUP
       inverted: True
-    name: "pool house heater button"
+    name: "Poolhus värmare knapp"
+    id: poolhouse_heater_button
     on_press:
       then:
         - switch.turn_on: relay1
@@ -38,9 +39,10 @@ binary_sensor:
         - switch.turn_off: relay1
   - platform: status
     name: "Poolhus Värmare Sonoff status"
+    id: poolhouse_heater_sonoff_status
 
 switch:
   - platform: gpio
-    name: "pool house heater relay"
+    name: "Poolhus Värmare relä"
     pin: GPIO12
     id: relay1
