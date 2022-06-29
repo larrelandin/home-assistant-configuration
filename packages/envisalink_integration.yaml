@@ -86,6 +86,16 @@ group:
       - binary_sensor.ir_bibliotek
       - binary_sensor.ir_hall_ovanvaning
 
+  motion_all_house_except_guestroom:
+    name: "Rörelse hela huset förutom gästrum"
+    entities:
+      - binary_sensor.ir_kok
+      - binary_sensor.ir_gastrum
+      - binary_sensor.ir_hall
+      - binary_sensor.ir_vardagsrum
+      - binary_sensor.ir_bibliotek
+      - binary_sensor.ir_hall_ovanvaning
+
   doors:
     name: "Ytterdörrar"
     entities:
