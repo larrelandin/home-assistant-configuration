@@ -24,6 +24,12 @@ api:
 ota:
   password: !secret esp_ota_password
 
+i2c:
+  sda: D2
+  scl: D1
+  scan: true
+  id: bus_a
+
 dallas:
   - pin: D7
 
@@ -31,32 +37,91 @@ binary_sensor:
   - platform: status
     name: "Pannrum ESP status"
 
+    # Critical warning
+  - platform: template
+    name: Pellets Level Critical Warning
+    icon: mdi:alert-octagram-outline
+    id: pellets_warning_critical
+    lambda: |-
+      return id(pellet_distance).state >= 0.895;
+      
+    # Warning
+  - platform: template
+    name: Pellets Level Warning
+    icon: mdi:alert-octagon-outline
+    id: pellets_warning
+    lambda: |-
+      return id(pellet_distance).state >= 0.7;
+
 sensor:
+  - platform: tof10120
+    id: pellet_distance_raw
+    name: "Pellet Distance Raw"
+    icon: mdi:arrow-expand-vertical
+    unit_of_measurement: "m"
+    accuracy_decimals: 3
+    update_interval: 15s
+
   - platform: ultrasonic
     trigger_pin: D5
     echo_pin: D6
-    name: "Pellet Level Raw"
-    id: pellet_level_raw
-    # filters:
-    # - lambda: return ((1.0 - x) / 0.85) * 100;
-    # - heartbeat: 300s
-    # accuracy_decimals: 
+    name: "Pellet Level Raw Ultrasonic"
+    id: pellet_level_raw_ultrasonic
 
   - platform: template
-    name: "Pellet Level Calculated"
-    id: pellet_level_calculated
-    unit_of_measurement: "%"
-    lambda: return ((1.0 - id(pellet_level_raw).state) / 0.85) * 100;
-
-  - platform: template
-    name: "Pellet Level"
-    id: pellet_level_filtered
-    unit_of_measurement: "%"
-    lambda: return id(pellet_level_calculated).state;
+    id: pellet_distance
+    name: "Pellet Distance"
+    icon: mdi:arrow-expand-vertical
+    unit_of_measurement: "m"
+    accuracy_decimals: 3
+    lambda: >
+      return id(pellet_distance_raw).state;
     filters:
-    - sliding_window_moving_average:
-        window_size: 30
-        send_every: 30
+      - max:
+          window_size: 30
+          send_every: 2
+          send_first_at: 2
+      - sliding_window_moving_average:
+          window_size: 30
+          send_every: 2
+          send_first_at: 2
+
+  - platform: template
+    name: "Pelletnivå procent"
+    id: pellet_level_percent
+    unit_of_measurement: "%"
+    icon: mdi:sack-percent
+    lambda: return ((1.0 - id(pellet_distance).state) / 0.85) * 100;
+    accuracy_decimals: 0
+    update_interval: 60s
+
+  - platform: template
+    id: pellet_sacks_in_bin
+    name: "Pelletsäckar i veckoförråd"
+    icon: mdi:sack
+    unit_of_measurement: "U"
+    lambda: >
+      return id(pellet_distance).state;
+    filters:
+      - calibrate_linear:
+        - 0.95 -> 0        # No pellets, estimated
+        - 0.894 -> 1 #Measured
+        - 0.836 -> 1.5
+        - 0.6-> 4 # Measured
+        - 0.3 -> 7 #Estimated
+        - 0.379 -> 9 #Measured
+        - 0.164 -> 11 #Measured
+        - 0.06  -> 12  # Full
+    update_interval: 60s
+
+  - platform: template
+    id: pellets_kg
+    name: Pellets Kg
+    icon: mdi:weight-kilogram
+    unit_of_measurement: "kg"
+    lambda: >
+      return id(pellet_sacks_in_bin).state * 16; // Each sack weighs 16Kg
+    update_interval: 60s
 
   - platform: dallas
     address: 0x0D0008022A1D9710
@@ -67,3 +132,7 @@ sensor:
         window_size: 30
         send_every: 30
     accuracy_decimals: 0
+
+button:
+  - platform: restart
+    name: ESP Pannrum Restart
