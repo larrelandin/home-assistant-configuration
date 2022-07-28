@@ -1,3 +1,2 @@
 tts:
   - platform: google_translate
-    base_url: https://hass.fixstar.net
