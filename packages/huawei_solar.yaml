@@ -15,9 +15,9 @@ template:
         state: "{{ states('sensor.solarbridge_daily_yield') }}"
 
   - sensor:
-      - name: "pv_total_yield"
+      - name: "Solarpanels production"
         unit_of_measurement: "kWh"
-        state_class: measurement
+        state_class: total_increasing
         device_class: energy
         icon: mdi:solar-power
         state: "{{ states('sensor.solarbridge_total_yield') }}"
