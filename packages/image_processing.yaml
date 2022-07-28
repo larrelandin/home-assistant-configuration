@@ -1,0 +1,15 @@
+# Example configuration.yaml entry
+image_processing:
+  - platform: doods
+    scan_interval: 10
+    url: "http://localhost:8080"
+    detector: default
+    source:
+      - entity_id: camera.poolcam_sd
+    file_out: "/config/www/doods_latest.jpg"
+    confidence: 40
+    labels:
+      - name: cat
+      - name: person
+        confidence: 70
+      - name: dog
