@@ -22,27 +22,6 @@ recorder:
   db_url: !secret connectionstring_mariadb
   purge_keep_days: 30
 
-# Slack App
-notify:
-  - name: slack_notify
-    platform: slack
-    api_key: !secret slack_api_key
-    default_channel: "#homeautomation"
-    username: "Home Assistant"
-    icon: ":octopus:"
-
-chargeamps:
-  username: !secret email_larre
-  password: !secret chargeamps_password
-  api_key: !secret chargeamps_api_key
-
-zone:
-  - name: Home
-    latitude: 55.693862
-    longitude: 13.231983
-    radius: 80
-    icon: mdi:home
-
 # Discover some devices automatically
 discovery:
 
@@ -65,19 +44,10 @@ sensor:
 # IOS App settings
 ios:
 
-# device_tracker:
-#   - platform: luci
-#     host: 192.168.10.1
-#     username: root
-#     password: !secret router_password
-#     consider_home: 240
-
 shopping_list:
 
 logger:
   default: info
-  # logs:
-  #   custom_components.fusion_solar_kiosk: debug
 
 group: !include groups.yaml
 automation: !include automations.yaml
