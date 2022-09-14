@@ -1,0 +1,33 @@
+template:
+  - sensor:
+      - name: "Nuvarande toppström inkommande faser huvudsäkringar ofiltrerat"
+        #unique_id: "energy_momentary_max_phase_current_main_fuses_unfiltered"
+        unit_of_measurement: "A"
+        state: "{%set mylist = states('sensor.current_phase_1'),states('sensor.current_phase_2'),states('sensor.current_phase_3')%}{{ mylist|max |int }}"
+  - sensor:
+      - name: "Pelletspris per kWh"
+        unit_of_measurement: "öre"
+        state: >
+          {{ (((states('input_number.pelletssackar_pris') | float / 16) / 0.91 ) / 4.8 * 100 ) | round(2) }}
+        # Pannans verkningsgrad 91%, Pellets 4,8 kWh/kg, 16kg pellets per säck
+
+sensor:
+  - platform: filter
+    name: "Nuvarande toppström inkommande faser huvudsäkringar"
+    entity_id: sensor.nuvarande_toppstrom_inkommande_faser_huvudsakringar_ofiltrerat
+    #unique_id: "energy_momentary_max_phase_current_main_fuses"
+    filters:
+      - filter: time_moving_max
+        window_size: "00:05"
+      # - filter: outlier
+      #   window_size: 3
+      #   radius: 2.0
+      # - filter: lowpass
+      #   time_constant: 3
+      #   precision: 0
+
+utility_meter:
+  energy_consumption_hourly:
+    name: Energikonsumption per timme
+    source: sensor.energy_consumed_luxembourg
+    cycle: hourly
