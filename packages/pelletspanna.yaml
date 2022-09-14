@@ -5,12 +5,12 @@ sensor:
     entity_ids:
       - sensor.pellets_kg
 
-  - platform: template
-    sensors:
-      pellets_kg_daily_min_inverted:
-        friendly_name: Pellets Kg Daily Inverted
-        unit_of_measurement: "Kg"
-        value_template: "{{ states('sensor.pellets_kg_daily_min') | float * -1.0 }}"
+template:
+  - sensor:
+    - name: pellets_kg_daily_min_inverted
+      unit_of_measurement: "Kg"
+      state: >
+        {{ states('sensor.pellets_kg_daily_min') | float * -1.0 }}
 
 utility_meter:
   daily_pellets:
