@@ -7,13 +7,12 @@ sensor:
       User-Agent: Home Assistant
       Content-Type: application/json
     scan_interval: 3600
-    value_template: "{{ value_json.value.0.value }}"
-    unit_of_measurement: " mm "
+    value_template: "{{ value_json.value.0.value if int(value_json.value.0.value) > 0 }}"
+    unit_of_measurement: "mm"
 
-  - platform: sql
-    db_url: !secret connectionstring_mariadb
-    queries:
-      - name: Regn Lund 7 dagar
-        query: "SELECT SUM(state) AS 'Rain7d' FROM `states` WHERE last_changed > CURRENT_TIMESTAMP() - INTERVAL 7 DAY AND entity_id = 'sensor.regn_lund' AND state > 0;"
-        column: "Rain7d"
-        unit_of_measurement: mm
+  - platform: statistics
+    name: Regn Lund senaste 7 dagar
+    state_characteristic: total
+    entity_id: sensor.regn_lund
+    max_age:
+      days: 7
