@@ -1,24 +1,62 @@
+template:
+  - sensor:
+      - name: "Panna framledning börvärde"
+        unique_id: heating_setpoint
+        state: "{{ (float(states.input_number.heating_curve.state) * (-1) * float(states.sensor.ow_outside_temp.state) + float(states.input_number.heating_offset.state)) }}"
+        unit_of_measurement: "°C"
+  - sensor:
+      - name: "Lägsta beräknad temperatur panna"
+        unique_id: "heating_goal_min_temp"
+        state: "{{ (((states.sensor.heating_setpoint.state | float) , (states.input_number.heating_mintemp.state | float)) | max ) }}"
+        unit_of_measurement: "°C"
+  - binary_sensor:
+      - name: "Heating system needed"
+        state: >
+          {% if  states('sensor.temperature_mean_last_month') !=  'unavailable' %}
+          {{ states('sensor.temperature_mean_last_month')|int < 17 }}
+          {% endif %}
+
 sensor:
-- platform: template
-  sensors:
-    heating_setpoint:
-      unit_of_measurement: "°C"
-      friendly_name: "Panna framledning börvärde"
-      value_template: "{{ (float(states.input_number.heating_curve.state) * (-1) * float(states.sensor.ow_outside_temp.state) + float(states.input_number.heating_offset.state)) }}"
-    heating_goal_min_temp:
-      unit_of_measurement: "°C"
-      friendly_name: Lägsta beräknad temperatur panna
-      value_template: "{{ (((states.sensor.heating_setpoint.state | float) , (states.input_number.heating_mintemp.state | float)) | max ) }}"
-# Utjämnad pelletskurva
-- platform: filter
-  name: "Filtered Pellet Level"
-  entity_id: sensor.pellet_level
-  filters:
-    - filter: time_simple_moving_average
-      window_size: 20
-    - filter: lowpass
-      time_constant: 20
-      precision: 0
+  # Utjämnad pelletskurva
+  - platform: filter
+    name: "Filtered Pellet Level"
+    entity_id: sensor.pellet_level
+    filters:
+      - filter: time_simple_moving_average
+        window_size: 20
+      - filter: lowpass
+        time_constant: 20
+        precision: 0
+
+  # Temperaturmedel över dygnet
+  - platform: statistics
+    name: "Temperature Mean last day"
+    entity_id: sensor.ow_outside_temp_rounded
+    state_characteristic: mean
+    precision: 0
+    sampling_size: 1500
+    max_age:
+      hours: 24
+
+  # Temperaturmedel över veckan
+  - platform: statistics
+    name: "Temperature Mean last week"
+    entity_id: sensor.ow_outside_temp_rounded
+    state_characteristic: mean
+    precision: 0
+    sampling_size: 1500
+    max_age:
+      days: 7
+
+  # Temperaturmedel över månaden
+  - platform: statistics
+    name: "Temperature Mean last month"
+    entity_id: sensor.ow_outside_temp_rounded
+    state_characteristic: mean
+    precision: 0
+    sampling_size: 1500
+    max_age:
+      days: 31
 
 # Trend panntemperatur
 binary_sensor:
@@ -37,7 +75,6 @@ binary_sensor:
         sample_duration: 300
         min_gradient: 0.0008
         device_class: heat
-
 
 # Kontroller för värme
 input_number:
