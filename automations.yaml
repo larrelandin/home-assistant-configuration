@@ -35,14 +35,229 @@
         gick online.
     service: notify.slack_notify
 - id: '1639476450382'
-  alias: deCONZ - Tradfri Shortcut Button
+  alias: deCONZ - Tradfri Shortcut Button SB1
   description: ''
   use_blueprint:
     path: Sam04/deconz-ikea-tradfri-shortcut-button.yaml
     input:
       remote: 1633905cadfba2fcd62f67f75f0bd40b
       button_short:
-      - type: toggle
-        device_id: b3621241cf76fa5c4effec9c92d02264
-        entity_id: light.shelly1_fonsterlampor_vardagsrum
-        domain: light
+      - service: input_button.press
+        data: {}
+        target:
+          entity_id: input_button.sb1_short_press
+- id: '1644057288305'
+  alias: Värmepanna Fyllning Pelletssäckar
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: input_button.confirmpelletfill
+  condition: []
+  action:
+  - service: notify.slack_notify
+    data:
+      title: Fyllning av pelllets
+      target: homeautomation_logs
+      message: '{{ states.person|selectattr("attributes.user_id", "==", trigger.to_state.context.user_id)|map(attribute="attributes.friendly_name")|first
+        }} fyllde {{ states(''input_number.pelletssackar_fyllning'') }} säckar pellets'
+  - service: counter.configure
+    data_template:
+      entity_id: counter.pelletssackar
+      value: ' {{ states(''counter.pelletssackar'')|int + states(''input_number.pelletssackar_fyllning'')|int
+        }}'
+  - service: counter.configure
+    data_template:
+      entity_id: counter.pelletssackar_lager
+      value: ' {{ states(''counter.pelletssackar_lager'')|int - states(''input_number.pelletssackar_fyllning'')|int
+        }}'
+  - service: button.press
+    data: {}
+    target:
+      entity_id: button.esp_pannrum_restart
+  - service: utility_meter.calibrate
+    data:
+      value: '0'
+    target:
+      entity_id: sensor.pellets_kg_since_last_fill
+  mode: single
+- id: '1644133469590'
+  alias: Värmepanna återställ årlig förbrukning
+  description: ''
+  trigger:
+  - platform: time
+    at: 01:00:00
+  condition:
+  - condition: template
+    value_template: '{{ now().day == 1 }}'
+  - condition: template
+    value_template: '{{ now().month == 7 }}'
+  action:
+  - service: input_number.set_value
+    data_template:
+      entity_id: input_number.pelletssackar_forbrukning_foregaende_ar
+      value: '{{ states(''counter.pelletssackar'')|int }}'
+  - device_id: 8c9f21ef026511eb8d9c83356b64f543
+    domain: mobile_app
+    type: notify
+    message: Återställde årlig förbrukning pellets
+    title: Återställning
+  - service: notify.slack_notify
+    data:
+      title: Återställning
+      target: homeautomation
+      message: Återställde årlig förbrukning pellets, totalt {{ states('counter.pelletssackar')
+        }} säckar
+  - service: counter.reset
+    data: {}
+    target:
+      entity_id: counter.pelletssackar
+  mode: single
+- id: '1646074081872'
+  alias: Soptunnor Påminnelse
+  description: Skickar påminnelse om att ta ut soptunnorna om inte gjort innan 20.00
+  trigger:
+  - platform: time
+    at: '20:00:00'
+  - platform: time
+    at: '21:00:00'
+  - platform: time
+    at: '22:00:00'
+  condition:
+  - condition: state
+    entity_id: input_boolean.satta_ut_soptunnor
+    state: 'on'
+  action:
+  - service: notify.mobile_app_larres_iphone_13
+    data:
+      message: Dags att ta ut tunnorna
+      title: Soptunnor
+  - service: notify.mobile_app_camilla_landins_iphone
+    data:
+      message: Dags att ta ut tunnorna
+      title: Soptunnor
+  mode: single
+- id: '1646077072609'
+  alias: Soptunnor sätt ut Aktivera
+  description: ''
+  trigger:
+  - platform: time
+    at: '15:00:00'
+  condition:
+  - condition: time
+    weekday:
+    - mon
+  - condition: template
+    value_template: '{{(as_timestamp(now())|timestamp_custom (''%U'') | int % 2) ==
+      1 }}'
+  action:
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.satta_ut_soptunnor
+  mode: single
+- id: '1646295058306'
+  alias: 'Soptunnor ta in Aktivera '
+  description: ''
+  trigger:
+  - platform: time
+    at: 08:00:00
+  condition:
+  - condition: time
+    weekday:
+    - tue
+  - condition: template
+    value_template: '{{(as_timestamp(now())|timestamp_custom (''%U'') | int % 2) ==
+      1 }}'
+  action:
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.ta_in_soptunnor
+  mode: single
+- id: '1648330926755'
+  alias: Cast HA to Kitchen
+  description: ''
+  use_blueprint:
+    path: kind3r/cast-and-re-cast-a-lovelace-view-to-a-google-hub.yaml
+    input:
+      player: media_player.nest_kok
+      view: kok
+- id: '1657399504458'
+  alias: Trigger notification on Doods detection
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - image_processing.doods_poolcam_sd
+    attribute: total_matches
+  condition:
+  - condition: numeric_state
+    entity_id: image_processing.doods_poolcam_sd
+    attribute: total_matches
+    above: '0'
+  action:
+  - service: notify.slack_notify
+    data:
+      message: Poolen - objekt upptäckt
+      data:
+        file:
+          path: /config/www/doods_latest.jpg
+  - delay:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+  mode: single
+- id: '1658738419847'
+  alias: Snapshot pool camera
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: '00'
+  condition: []
+  action:
+  - service: camera.snapshot
+    data:
+      filename: config/www/snapshots/pool_{{ now().strftime('%Y%m%d%H%M') }}.jpg
+    target:
+      device_id: 5b8763815cd77fddbef208fd2a3696fd
+  - service: shell_command.upload_nyckel_training_image
+    data: {}
+  - service: system_log.write
+    data:
+      level: info
+      message: '"Took a pool snapshot"'
+      logger: Snapshot automation
+  mode: single
+- id: '1658996877167'
+  alias: Tvättmaskin färdig
+  description: ''
+  trigger:
+  - type: power
+    platform: device
+    device_id: 1ce148b34e70101bb78af834f1efa9af
+    entity_id: sensor.tvattmaskin_power
+    domain: sensor
+    above: 500
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 0
+  condition: []
+  action:
+  - wait_for_trigger:
+    - type: power
+      platform: device
+      device_id: 1ce148b34e70101bb78af834f1efa9af
+      entity_id: sensor.tvattmaskin_power
+      domain: sensor
+      below: 10
+      for:
+        hours: 0
+        minutes: 1
+        seconds: 0
+    continue_on_timeout: false
+  - service: notify.mobile_app_larres_iphone_131
+    data:
+      message: Tvättmaskin färdig!
+  mode: single
