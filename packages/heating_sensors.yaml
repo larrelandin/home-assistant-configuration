@@ -28,36 +28,6 @@ sensor:
         time_constant: 20
         precision: 0
 
-  # Temperaturmedel över dygnet
-  - platform: statistics
-    name: "Temperature Mean last day"
-    entity_id: sensor.ow_outside_temp_rounded
-    state_characteristic: mean
-    precision: 0
-    sampling_size: 1500
-    max_age:
-      hours: 24
-
-  # Temperaturmedel över veckan
-  - platform: statistics
-    name: "Temperature Mean last week"
-    entity_id: sensor.ow_outside_temp_rounded
-    state_characteristic: mean
-    precision: 0
-    sampling_size: 1500
-    max_age:
-      days: 7
-
-  # Temperaturmedel över månaden
-  - platform: statistics
-    name: "Temperature Mean last month"
-    entity_id: sensor.ow_outside_temp_rounded
-    state_characteristic: mean
-    precision: 0
-    sampling_size: 1500
-    max_age:
-      days: 31
-
 # Trend panntemperatur
 binary_sensor:
   - platform: trend
