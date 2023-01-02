@@ -1,5 +1,5 @@
 esphome:
-  name: poolhus-heater-sonoff
+  name: jul1-sonoff
   platform: ESP8266
   board: esp01_1m
 
@@ -30,19 +30,30 @@ binary_sensor:
       number: GPIO0
       mode: INPUT_PULLUP
       inverted: True
-    name: "Poolhus värmare knapp"
-    id: poolhouse_heater_button
+    name: "Jul1 knapp"
+    id: jul1_button
     on_press:
       then:
-        - switch.turn_on: relay1
-        - delay: 1h
-        - switch.turn_off: relay1
+        if:
+          condition:
+          - light.is_off: light1
+          then:
+          - light.turn_on: light1
+          - delay: 1h
+          - light.turn_off: light1
+          else:
+            - light.turn_off: light1
   - platform: status
-    name: "Poolhus Värmare Sonoff status"
-    id: poolhouse_heater_sonoff_status
+    name: "Jul1 Sonoff status"
+    id: jul1_sonoff_status
 
-switch:
+output:
   - platform: gpio
-    name: "Poolhus Värmare relä"
     pin: GPIO12
     id: relay1
+
+light:
+  - platform: binary
+    name: "Jul1"
+    id: light1
+    output: relay1
