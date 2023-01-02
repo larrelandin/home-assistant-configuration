@@ -2,40 +2,48 @@ sensor:
   - platform: daily_min_max
     name: Pellets Kg Daily Min
     type: min
+    manual_reset_only: true
     entity_ids:
       - sensor.pellets_kg
 
 template:
   - sensor:
-    - name: pellets_kg_daily_min_inverted
-      unit_of_measurement: "Kg"
-      state: >
-        {{ states('sensor.pellets_kg_daily_min') | float * -1.0 }}
+      - name: pellets_kg_daily_min_inverted
+        unit_of_measurement: "Kg"
+        state: >
+          {{ states('sensor.pellets_kg_daily_min') | float * -1.0 }}
 
 utility_meter:
   daily_pellets:
     source: sensor.pellets_kg_daily_min_inverted
     cycle: daily
+    unique_id: daily_pellets
     net_consumption: false
   weekly_pellets:
     source: sensor.pellets_kg_daily_min_inverted
     cycle: weekly
+    unique_id: weekly_pellets
     net_consumption: false
   monthly_pellets:
     source: sensor.pellets_kg_daily_min_inverted
     cycle: monthly
+    unique_id: monthly_pellets
     net_consumption: false
   quarterly_pellets:
     source: sensor.pellets_kg_daily_min_inverted
     cycle: quarterly
+    unique_id: quarterly_pellets
     net_consumption: false
   yearly_pellets:
     source: sensor.pellets_kg_daily_min_inverted
-    cycle: yearly
+    unique_id: yearly_pellets
+    cron: "0 0 1 6 *"
     net_consumption: false
   pellets_kg_since_last_clean:
+    unique_id: pellets_kg_since_last_clean
     source: sensor.pellets_kg_daily_min_inverted
     net_consumption: false
   pellets_kg_since_last_fill:
+    unique_id: pellets_kg_since_last_fill
     source: sensor.pellets_kg_daily_min_inverted
     net_consumption: false

@@ -10,7 +10,11 @@ template:
         state: >
           {{ (((states('input_number.pelletssackar_pris') | float / 16) / 0.91 ) / 4.8 * 100 ) | round(2) }}
         # Pannans verkningsgrad 91%, Pellets 4,8 kWh/kg, 16kg pellets per säck
-
+  - sensor:
+      - name: "Beräkning slut på pellets"
+        unit_of_measurement: "dagar"
+        state: >
+          {{ ((states.counter.pelletssackar_lager.state|int+states.sensor.pelletsackar_i_veckoforrad.state|float)*16/max((states.sensor.daily_pellets.attributes.last_period|float),(states.sensor.daily_pellets.state|float),(states.sensor.weekly_pellets.state|float/7),(states.sensor.weekly_pellets.attributes.last_period|float/7)))|round(0) }}
 sensor:
   - platform: filter
     name: "Nuvarande toppström inkommande faser huvudsäkringar"
