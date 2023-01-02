@@ -1,0 +1,43 @@
+esphome:
+  name: garage-door-esp
+  on_boot: 
+    then:
+      - lock.lock: garage
+
+esp8266:
+  board: esp01_1m
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret esp_api_password
+  
+ota:
+  password: !secret esp_ota_password
+
+wifi:
+  ssid: 'landin iot'
+  password: !secret landin_iot_wifi_password
+  domain: '.landin.lan'
+  fast_connect: true
+
+  manual_ip:
+    static_ip: 192.168.10.62
+    gateway: 192.168.10.1
+    subnet: 255.255.255.0
+
+output:
+  - platform: gpio
+    pin: GPIO0
+    id: relay
+lock:
+  - platform: output
+    id: garage
+    name: "Garagedörr"
+    output: relay
+
+binary_sensor:
+  - platform: status
+    name: "Garagedörr ESP status"
