@@ -1,0 +1,48 @@
+nordpool:
+
+sensor:
+  - platform: nordpool
+
+    # Should the prices include vat? Default True
+    VAT: True
+
+    # What currency the api fetches the prices in
+    # this is only need if you want a sensor in a non local currency
+    currency: "SEK"
+
+    # Option to show prices in cents (or the equivalent in local currency)
+    price_in_cents: true
+
+    # Helper so you can set your "low" price
+    # low_price = hour_price < average * low_price_cutoff
+    low_price_cutoff: 0.95
+
+    # What power regions your are interested in.
+    # Possible values: "DK1", "DK2", "FI", "LT", "LV", "Oslo", "Kr.sand", "Bergen", "Molde", "Tr.heim", "Tromsø", "SE1", "SE2", "SE3","SE4", "SYS", "EE"
+    region: "SE4"
+
+    # How many decimals to use in the display of the price
+    precision: 4
+
+    # What the price should be displayed in default
+    # Possible values: MWh, kWh and Wh
+    # default: kWh
+    price_type: kWh
+
+    # This option allows the usage of a template to add a tariff.
+    # now() always refers start of the hour of that price.
+    # this way we can calculate the correct costs add that to graphs etc.
+    # The price result of the additional_costs template expects this additional cost to be in kWh and not cents as a float
+    # default {{0.0|float}}
+    # Elöverföring 24.5 öre/kWh
+    # Energiskatt 45 öre/kWh
+    additional_costs: "{{ (0.245|float) + (0.45|float) }}"
+
+template:
+  - sensor:
+      - name: "Nuvarande elpris"
+        unit_of_measurement: "SEK/kWh"
+        device_class: monetary
+        unique_id: "current_electricity_price_kr"
+        state: >
+          {{ states('sensor.nordpool_kwh_se4_sek_4_095_025') | float / 100 }}
