@@ -16,3 +16,4 @@ sensor:
     entity_id: sensor.regn_lund
     max_age:
       days: 7
+    sampling_size: 50
