@@ -35,7 +35,7 @@
         gick online.
     service: notify.slack_notify
 - id: '1639476450382'
-  alias: deCONZ - Tradfri Shortcut Button SB1
+  alias: SB1 Trådfri button
   description: ''
   use_blueprint:
     path: Sam04/deconz-ikea-tradfri-shortcut-button.yaml
@@ -58,8 +58,7 @@
     data:
       title: Fyllning av pelllets
       target: homeautomation_logs
-      message: '{{ states.person|selectattr("attributes.user_id", "==", trigger.to_state.context.user_id)|map(attribute="attributes.friendly_name")|first
-        }} fyllde {{ states(''input_number.pelletssackar_fyllning'') }} säckar pellets'
+      message: Automation fyllning av pellets påbörjad
   - service: counter.configure
     data_template:
       entity_id: counter.pelletssackar
@@ -74,11 +73,30 @@
     data: {}
     target:
       entity_id: button.esp_pannrum_restart
+  - delay:
+      hours: 0
+      minutes: 5
+      seconds: 0
+      milliseconds: 0
+  - service: daily_min_max.reset
+    data: {}
+    target:
+      entity_id: sensor.pellets_kg_daily_min
   - service: utility_meter.calibrate
     data:
       value: '0'
     target:
       entity_id: sensor.pellets_kg_since_last_fill
+  - service: notify.larre_phone
+    data:
+      message: Pellets har fyllts.
+      title: Pellets
+  - service: notify.slack_notify
+    data:
+      title: Fyllning av pelllets
+      target: homeautomation_logs
+      message: '{{ states.person|selectattr("attributes.user_id", "==", trigger.to_state.context.user_id)|map(attribute="attributes.friendly_name")|first
+        }} fyllde {{ states(''input_number.pelletssackar_fyllning'') }} säckar pellets'
   mode: single
 - id: '1644133469590'
   alias: Värmepanna återställ årlig förbrukning
@@ -127,11 +145,11 @@
     entity_id: input_boolean.satta_ut_soptunnor
     state: 'on'
   action:
-  - service: notify.mobile_app_larres_iphone_13
+  - service: notify.larre_phone
     data:
       message: Dags att ta ut tunnorna
       title: Soptunnor
-  - service: notify.mobile_app_camilla_landins_iphone
+  - service: notify.camilla_phone
     data:
       message: Dags att ta ut tunnorna
       title: Soptunnor
@@ -257,7 +275,132 @@
         minutes: 1
         seconds: 0
     continue_on_timeout: false
-  - service: notify.mobile_app_larres_iphone_131
+  - service: notify.larre_phone
     data:
-      message: Tvättmaskin färdig!
+      message: Tvättmaskinen är färdig!
+      title: Tvättmaskin
+  - service: notify.slack_notify
+    data:
+      message: Tvättmaskin färdig
+      target: homeautomation_logs
+  mode: single
+- id: '1663259647190'
+  alias: SB2 Trådfri button
+  description: ''
+  use_blueprint:
+    path: Sam04/deconz-ikea-tradfri-shortcut-button.yaml
+    input:
+      remote: 8fc32af68446cb32cd9145d7db711f0a
+      button_short:
+      - service: input_button.press
+        data: {}
+        target:
+          entity_id: input_button.sb2_short_press
+      button_long:
+      - service: input_button.press
+        data: {}
+        target:
+          entity_id: input_button.sb2_long_press
+- id: '1664945566552'
+  alias: Torktumlare färdig
+  description: ''
+  trigger:
+  - type: power
+    platform: device
+    device_id: f40414b91ad5c50edf9082184d94de06
+    entity_id: sensor.torktumlare_power
+    domain: sensor
+    above: 1000
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 0
+  condition: []
+  action:
+  - wait_for_trigger:
+    - type: power
+      platform: device
+      device_id: f40414b91ad5c50edf9082184d94de06
+      entity_id: sensor.torktumlare_power
+      domain: sensor
+      below: 50
+      for:
+        hours: 0
+        minutes: 1
+        seconds: 0
+    continue_on_timeout: false
+  - service: notify.larre_phone
+    data:
+      message: Torktumlaren är färdig!
+      title: Torktumlare
+  - service: notify.slack_notify
+    data:
+      message: Torktumlare färdig
+      target: homeautomation_logs
+  mode: single
+- id: '1666252779539'
+  alias: Slimmelezer offline
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.current_phase_1
+    to: unknown
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+  - platform: state
+    entity_id:
+    - sensor.current_phase_1
+    to: unavailable
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+  condition: []
+  action:
+  - service: notify.larre_slack
+    data:
+      message: Slimmelezer offline
+      title: Slimmelezer offline?
+  - service: notify.larre_phone
+    data:
+      title: Slimmelezer offline?
+      message: Slimmelezer offline
+  - service: notify.slack_notify
+    data:
+      message: Slimmelezer offline
+      title: Slimmelezer offline?
+      target: homeautomation_logs
+  mode: single
+- id: '1670082620377'
+  alias: Charge Amps reset last charge counters when EV2 is disconnected
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.charge_amps_charging_status
+    from: Connected
+    to: Available
+  - platform: state
+    entity_id:
+    - sensor.charge_amps_charging_status
+    from: Charging
+    to: Available
+  condition: []
+  action:
+  - service: notify.slack_notify
+    data_template:
+      message: Charge Amps senaste laddning {{ states('sensor.charge_amps_last_charge_kwh')
+        }} kWh till en kostnad av {{ states('sensor.charge_amps_last_charge_cost')
+        | round }} kr
+      target: homeautomation
+  - service: utility_meter.calibrate
+    data:
+      value: '0'
+    target:
+      entity_id:
+      - sensor.charge_amps_last_charge_kwh
+      - sensor.charge_amps_last_charge_cost
   mode: single
