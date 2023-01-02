@@ -9,3 +9,25 @@ template:
         unique_id: "charge_amps_total_consumption_latest_charge_kwh"
         unit_of_measurement: "kWh"
         state: "{% if is_state('sensor.charge_amps_charging_status', 'Charging') %} {{ state_attr('sensor.charge_amps_charging_status', 'total_consumption_kwh') }} {% endif %}"
+
+  - sensor:
+      - name: Charge Amps kostnad nu
+        unit_of_measurement: "SEK"
+        unique_id: 7ea555a3-6612-42d1-bc52-03510450151e
+        state: "{{ states('sensor.nuvarande_elpris') | float * states('sensor.charge_amps_energy_per_hour') | float }}"
+
+utility_meter:
+  charge_amps_energy_per_hour:
+    source: sensor.charge_amps_total_energy
+    unique_id: f7745f0f-78d0-4541-91e0-a5e8891ceafa
+    cycle: hourly
+  daily_cost_charge_amps:
+    source: sensor.charge_amps_kostnad_nu
+    unique_id: daily_cost_charge_amps
+    cycle: daily
+  cost_charge_amps_last_charge:
+    source: sensor.charge_amps_kostnad_nu
+    unique_id: f1909eb0-55d0-4397-b901-3729210c2616
+  charge_amps_latest_charge_kwh:
+    source: sensor.charge_amps_total_energy
+    unique_id: 8da397b0-83a1-410d-9e26-4e28844bbebb
