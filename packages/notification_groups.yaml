@@ -1,0 +1,15 @@
+notify:
+  - platform: group
+    name: "Larre_phone"
+    services:
+      - service: mobile_app_larres_iphone_131
+  - platform: group
+    name: "Larre_slack"
+    services:
+      - service: slack_notify
+        data:
+          target: "@larre"
+  - platform: group
+    name: "Camilla_phone"
+    services:
+      - service: mobile_app_camilla_landins_iphone
