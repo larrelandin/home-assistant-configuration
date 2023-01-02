@@ -19,7 +19,7 @@ logger:
 
 # Enable Home Assistant API
 api:
-   password: !secret esp_api_password
+  password: !secret esp_api_password
 
 ota:
   password: !secret esp_ota_password
@@ -54,3 +54,5 @@ switch:
     - switch.turn_on: buzzer
     - delay: 500ms
     - switch.turn_off: buzzer
+  - platform: restart
+    name: "Poolhus ESP restart"
