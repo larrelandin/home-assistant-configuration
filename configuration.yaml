@@ -38,8 +38,7 @@ sensor:
       - type: last_boot
       - type: processor_use
 
-  # Swedish calendar
-  - platform: swedish_calendar
+swedish_calendar:
 
 # IOS App settings
 ios:
