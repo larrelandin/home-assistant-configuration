@@ -14,7 +14,10 @@ template:
       - name: Charge Amps kostnad nu
         unit_of_measurement: "SEK"
         unique_id: 7ea555a3-6612-42d1-bc52-03510450151e
-        state: "{{ states('sensor.nuvarande_elpris') | float * states('sensor.charge_amps_energy_per_hour') | float }}"
+        state: >
+          {% if not is_state('sensor.nuvarande_elpris', 'unavailable') and not is_state('sensor.charge_amps_energy_per_hour', 'unavailable') and not is_state('sensor.nuvarande_elpris', 'unknown') and not is_state('sensor.charge_amps_energy_per_hour', 'unknown') %}
+          {{ states('sensor.nuvarande_elpris') | float * states('sensor.charge_amps_energy_per_hour') | float }}
+          {% endif %}
 
 utility_meter:
   charge_amps_energy_per_hour:
