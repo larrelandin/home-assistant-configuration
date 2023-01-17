@@ -34,7 +34,6 @@ sensor:
     name: "Dagsljus ofiltrerat"
     id: daylight_unfiltered
     update_interval: 60s
-    unit_of_measurement: "lx"
     filters:       
     - lambda: return 100.0 - (x * 100.0);
     
