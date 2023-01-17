@@ -85,71 +85,39 @@ sensor:
 template:
   - binary_sensor:
       - name: "Senaste veckans medeltemperatur under 10 grader"
-        state: "{{ states('sensor.temperature_mean_last_week') | float < 10 }}"
+        state: >
+          {% if not is_state('sensor.temperature_mean_last_week', 'unavailable') %}
+          {{ states('sensor.temperature_mean_last_week') | float < 10 }}
+          {% endif %}
         unique_id: "41b1a348-4fc4-41be-ae14-5b1432fe2218"
 
   - sensor:
       - name: ow_outside_temp_rounded
+        unique_id: 283a3670-b909-46d8-bfa6-749e70a03866
         unit_of_measurement: "°C"
         state: "{{ (states('sensor.ow_outside_temp') | round(1)) }}"
-        attributes:
-          friendly_name: "Ute"
+
       - name: ow_boiler_temp_rounded
+        unique_id: e878a1b4-375c-4b41-b967-2885adc612c9
         unit_of_measurement: "°C"
-        attributes:
-          friendly_name: "Panna"
         state: "{{ (states('sensor.ow_boiler_temp') | round(1)) }}"
+
       - name: ow_boiler_out_temp_rounded
+        unique_id: 44cec4b6-352e-4040-a792-aa051951ca4a
         unit_of_measurement: "°C"
-        attributes:
-          friendly_name: "Panna framledning"
         state: "{{ (states('sensor.ow_boiler_out_temp')|round(1)) }}"
+
       - name: ow_pool_temp_rounded
+        unique_id: 4cc0e228-30b5-4e8a-8ccc-c59dbc46058c
         unit_of_measurement: "°C"
-        attributes:
-          friendly_name: "Pool"
         state: "{{ (states('sensor.ow_pool_temp')|round(1)) }}"
+
       - name: ow_pool_techroom_temp_rounded
+        unique_id: f12593c0-879d-4164-b86e-9579939a2923
         unit_of_measurement: "°C"
-        attributes:
-          friendly_name: "Teknikshakt"
         state: "{{ (states('sensor.ow_pool_techroom_temp')|round(1)) }}"
+
       - name: ow_kitchen_temp_rounded
+        unique_id: f08cbc34-e72a-4cb8-abd9-26778303bc99
         unit_of_measurement: "°C"
-        attributes:
-          friendly_name: "Köket"
         state: "{{ (states('sensor.ow_kitchen_temp')|round(1)) }}"
-
-
-  # - platform: template
-  #   sensors:
-  #     # ow_outside_temp_rounded:
-  #     #   unit_of_measurement: "°C"
-  #     #   friendly_name: "Ute"
-  #     #   icon_template: mdi:thermometer
-  #     #   value_template: "{{ (states.sensor.ow_outside_temp.state|round(1)) }}"
-  #     ow_boiler_temp_rounded:
-  #       unit_of_measurement: "°C"
-  #       friendly_name: "Panna"
-  #       icon_template: mdi:coolant-temperature
-  #       value_template: "{{ (states.sensor.ow_boiler_temp.state|round(1)) }}"
-  #     ow_boiler_out_temp_rounded:
-  #       unit_of_measurement: "°C"
-  #       friendly_name: "Panna framledning"
-  #       icon_template: mdi:coolant-temperature
-  #       value_template: "{{ (states.sensor.ow_boiler_out_temp.state|round(1)) }}"
-  #     ow_pool_temp_rounded:
-  #       unit_of_measurement: "°C"
-  #       friendly_name: "Pool"
-  #       icon_template: mdi:pool
-  #       value_template: "{{ (states.sensor.ow_pool_temp.state|round(1)) }}"
-  #     ow_pool_techroom_temp_rounded:
-  #       unit_of_measurement: "°C"
-  #       friendly_name: "Teknikshakt"
-  #       icon_template: mdi:thermometer
-  #       value_template: "{{ (states.sensor.ow_pool_techroom_temp.state|round(1)) }}"
-  #     ow_kitchen_temp_rounded:
-  #       unit_of_measurement: "°C"
-  #       friendly_name: "Köket"
-  #       value_template: "{{ (states.sensor.ow_kitchen_temp.state|round(1)) }}"
-  #       icon_template: mdi:thermometer
