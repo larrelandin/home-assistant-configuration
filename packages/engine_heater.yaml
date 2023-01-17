@@ -145,69 +145,56 @@ input_boolean:
     name: "Forcera timer (1 timme)"
 
 # Template sensors
-sensor:
-  - platform: template
-    sensors:
-      car_heater_departure_time:
-        friendly_name: "Tid för avfärd"
-        icon_template: mdi:clock
-        value_template: >-
-          {% if states('input_number.car_heater_hour')|int|string|length == 1 %}0{% endif -%}
-          {{- states('input_number.car_heater_hour')|int|string -}}:
-          {%- if states('input_number.car_heater_minutes')|int|string|length == 1 %}0{% endif -%}
-          {{- states('input_number.car_heater_minutes')|int|string -}}
+template:
+  - binary_sensor:
+    - name: engine_heater_on
+      unique_id: 4df8c15e-3445-4632-a161-36f0de1b1d62
+      device_class: heat
+      state: "{{ is_state('switch.charge_amps_schuko', 'on') }}"
 
-  - platform: template
-    sensors:
-      car_heater_run_time:
-        friendly_name: "Beräknad gångtid"
-        unit_of_measurement: h
-        value_template: >
-          {% if ((states('input_number.car_heater_estimated_outside_temp')|float) < 10) %}
-            {% if not states('input_number.car_heater_estimated_outside_temp') == 'unknown' %}
-              {{(states('input_number.car_heater_estimated_outside_temp')|float * (-0.05) + 1)|round(1)}}
-            {%endif%}
-          {%else%}
-            0
+  - sensor:
+    - name: car_heater_departure_time
+      state: >
+        {% if states('input_number.car_heater_hour')|int|string|length == 1 %}0{% endif -%}
+        {{- states('input_number.car_heater_hour')|int|string -}}:
+        {%- if states('input_number.car_heater_minutes')|int|string|length == 1 %}0{% endif -%}
+        {{- states('input_number.car_heater_minutes')|int|string -}}
+
+    - name: car_heater_run_time
+      unique_id: e5fb852f-0a6d-468d-9e89-5605dc5b7513
+      unit_of_measurement: h
+      state: >
+        {% if ((states('input_number.car_heater_estimated_outside_temp')|float) < 10) %}
+          {% if not states('input_number.car_heater_estimated_outside_temp') == 'unknown' %}
+            {{(states('input_number.car_heater_estimated_outside_temp')|float * (-0.05) + 1)|round(1)}}
           {%endif%}
+        {%else%}
+          0
+        {%endif%}
 
-  - platform: template
-    sensors:
-      car_heater_start_time:
-        friendly_name: "Beräknad starttid"
-        icon_template: mdi:clock
-        value_template: >
-          {% if states.sensor.car_heater_departure_time.state is defined %}
-            {% if ((states('sensor.car_heater_run_time')|float) > 0) %}
-              {{ strptime(((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) - (states('sensor.car_heater_run_time')|float * 3600))|timestamp_custom), '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
-            {%else%}
-              Never
-            {%endif%}
-          {% else %}
-              waiting for sensors
-          {% endif%}
-  - platform: template
-    sensors:
-      car_heater_3h_before_start_time:
-        friendly_name: "3h before start time"
-        icon_template: mdi:clock
-        value_template: >
-          {% if states.sensor.car_heater_departure_time.state is defined %}
-              {{ strptime(((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) - (10800))|timestamp_custom), '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
-          {% else %}
-              waiting for sensors
-          {% endif%}
-  - platform: template
-    sensors:
-      car_heater_actual_stop_time:
-        friendly_name: "Faktisk stopptid (+15 min)"
-        icon_template: mdi:clock
-        value_template: >
-          {{ strptime((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) + (float ( 15*60 )))|timestamp_custom, '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
-binary_sensor:
-  - platform: template
-    sensors:
-      engine_heater_on:
-        friendly_name: "Motorvärmare status"
-        device_class: heat
-        value_template: "{{ is_state('switch.charge_amps_schuko', 'on') }}"
+    - name: car_heater_start_time
+      unique_id: cef95a60-f32e-4fd9-b014-54c2b922d6fc
+      state: >
+        {% if states.sensor.car_heater_departure_time.state is defined %}
+        {% if ((states('sensor.car_heater_run_time')|float) > 0) %}
+          {{ strptime(((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) - (states('sensor.car_heater_run_time')|float * 3600))|timestamp_custom), '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
+        {%else%}
+          Never
+        {%endif%}
+        {% else %}
+          waiting for sensors
+        {% endif%}
+
+    - name: car_heater_3h_before_start_time
+      unique_id: 96dfbea1-331e-4bfc-89fd-74415b3e2573
+      state: >
+        {% if states.sensor.car_heater_departure_time.state is defined %}
+          {{ strptime(((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) - (10800))|timestamp_custom), '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
+        {% else %}
+          waiting for sensors
+        {% endif%}
+
+    - name: car_heater_actual_stop_time
+      unique_id: ccf99730-208d-4335-8281-a77f2110b5e5
+      state: >
+        {{ strptime((as_timestamp('1970-01-01 ' ~ states('sensor.car_heater_departure_time')) + (float ( 15*60 )))|timestamp_custom, '%Y-%m-%d %H:%M:%S').strftime("%H:%M") }}
