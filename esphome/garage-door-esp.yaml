@@ -2,7 +2,7 @@ esphome:
   name: garage-door-esp
   on_boot: 
     then:
-      - lock.lock: garage
+      - lock.lock: lock_garage
 
 esp8266:
   board: esp01_1m
@@ -18,8 +18,8 @@ ota:
   password: !secret esp_ota_password
 
 wifi:
-  ssid: 'landin iot'
-  password: !secret landin_iot_wifi_password
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
   domain: '.landin.lan'
   fast_connect: true
 
@@ -34,10 +34,28 @@ output:
     id: relay
 lock:
   - platform: output
-    id: garage
+    id: lock_garage
     name: "Garagedörr"
     output: relay
 
 binary_sensor:
+  - platform: gpio
+    id: door_garage
+    name: "Garagedörr"
+    device_class: door
+    pin:
+      # Connected to GPIO on the ESP-01S.
+      number: GPIO3
+      mode: INPUT_PULLUP
+      inverted: false
+    filters:
+      # Small filter, to debounce the magnet.
+      - delayed_on: 25ms
+      - delayed_off: 25ms
   - platform: status
     name: "Garagedörr ESP status"
+
+status_led:
+  pin: 
+    number: GPIO2
+    inverted: true
