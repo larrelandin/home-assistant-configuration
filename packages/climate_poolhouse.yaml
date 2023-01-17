@@ -8,10 +8,11 @@ climate:
     min_temp: 3
     max_temp: 40
     precision: 1.0
-sensor:
-  - platform: thermal_comfort
-    sensors:
-      poolhouse:
-        friendly_name: Poolhus
-        temperature_sensor: sensor.temperatur_poolhus
-        humidity_sensor: sensor.fukt_poolhus
+
+thermal_comfort:
+  - custom_icons: false
+    sensor:
+    - name: "Poolhus Thermal Sensor"
+      unique_id: 5aace9ad-3bba-4cca-beaa-4e0dfd9e6d19
+      temperature_sensor: sensor.temperatur_poolhus
+      humidity_sensor: sensor.fukt_poolhus
