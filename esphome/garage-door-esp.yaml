@@ -12,7 +12,8 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: !secret esp_api_password
+  encryption:
+    key: "8iZjjR6vQlB19toVfWVa1tphoEcABFXJOtktAY+oVdY="
   
 ota:
   password: !secret esp_ota_password
@@ -45,7 +46,7 @@ binary_sensor:
     device_class: door
     pin:
       # Connected to GPIO on the ESP-01S.
-      number: GPIO3
+      number: GPIO2
       mode: INPUT_PULLUP
       inverted: false
     filters:
@@ -55,7 +56,7 @@ binary_sensor:
   - platform: status
     name: "Garagedörr ESP status"
 
-status_led:
-  pin: 
-    number: GPIO2
-    inverted: true
+#status_led:
+#  pin: 
+#    number: GPIO2
+#    inverted: true

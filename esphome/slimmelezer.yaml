@@ -66,6 +66,8 @@
             if (private_key.length() == 32)
               private_key.copy(id(stored_decryption_key), 32);
             id(dsmr_instance).set_decryption_key(private_key);
+    encryption:
+      key: "YIFnXEjXJSYLUghvmL+E29rvH4LMu6J1byz5BrWKZ2c="
 
   ota:
 

@@ -19,7 +19,8 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: !secret esp_api_password
+  encryption:
+    key: "oo444VFnr8UF/QX/EEX1WjgAxbH07jBEhdchYNL/6CE="
 
 ota:
   password: !secret esp_ota_password
@@ -105,17 +106,12 @@ sensor:
     filters:
       - calibrate_linear: # Measuring sacks in the bin, not the ones filled (12-x)
         - 0.95 -> 0        # No pellets, estimated
-        - 0.817 -> 2
-        #- 0.894 -> 1 #Measured
-        #- 0.836 -> 1.5
+        - 0.85 -> 3.5
         - 0.795 -> 4
-        - 0.736 -> 5 #Measured
-        #- 0.6-> 4 # Measured
-        #- 0.3 -> 7 #Estimated
+        - 0.736 -> 5
         - 0.57 -> 8
-        #- 0.379 -> 9 #Measured
-        #- 0.164 -> 11 #Measured
-        - 0.113  -> 12  # Full
+        - 0.06 -> 11
+        - 0.02  -> 12  # Full
     update_interval: 60s
 
   - platform: template
