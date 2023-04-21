@@ -35,8 +35,8 @@ sensor:
     # The price result of the additional_costs template expects this additional cost to be in kWh and not cents as a float
     # default {{0.0|float}}
     # Elöverföring 24.5 öre/kWh
-    # Energiskatt 45 öre/kWh
-    additional_costs: "{{ (0.245|float) + (0.45|float) }}"
+    # Energiskatt 49 öre/kWh
+    additional_costs: "{{ ((0.245|float) + (0.49|float)) * 1.25 }}"
 
 template:
   - sensor:
