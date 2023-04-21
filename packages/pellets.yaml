@@ -12,6 +12,33 @@ template:
         unit_of_measurement: "Kg"
         state: >
           {{ states('sensor.pellets_kg_daily_min') | float * -1.0 }}
+  - sensor:
+      - name: "Pelletspris"
+        unit_of_measurement: "Öre/kWh"
+        unique_id: 537d3154-1d86-44fe-9e52-fe62304a0a11
+        state: >
+          {{ (((states('input_number.pelletssackar_pris') | float / 16) / 0.91 ) / 4.8 * 100 ) | round(2) }}
+        # Pannans verkningsgrad 91%, Pellets 4,8 kWh/kg, 16kg pellets per säck
+  - sensor:
+      - name: "Pelletspris kronor"
+        unit_of_measurement: "Kr/kWh"
+        unique_id: 0a8f94ea-a723-45ea-b881-b6f3c2677ad4
+        state: >
+          {{ states('sensor.pelletspris') | float / 100 }}
+  - sensor:
+      - name: "Beräkning slut på pellets"
+        unit_of_measurement: "dagar"
+        unique_id: a2ab8cc7-502f-4383-b286-30d1cc0925f1
+        state: >
+          {{ ((states.counter.pelletssackar_lager.state|int+states.sensor.pelletsackar_i_veckoforrad.state|float)*16/max((states.sensor.daily_pellets.attributes.last_period|float),(states.sensor.daily_pellets.state|float),(states.sensor.weekly_pellets.state|float/7),(states.sensor.weekly_pellets.attributes.last_period|float/7)))|round(0) }}
+  - sensor:
+      - name: "Pellets konsumption energi"
+        unit_of_measurement: kWh
+        unique_id: 0d3ec94c-ad46-478d-8908-66b55eb496bb
+        state_class: total_increasing
+        device_class: energy
+        state: >
+          {{ states('sensor.yearly_pellets') | float * 4.8 }}
 
 utility_meter:
   daily_pellets:
