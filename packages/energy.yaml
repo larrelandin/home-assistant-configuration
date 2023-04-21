@@ -1,20 +1,10 @@
 template:
   - sensor:
       - name: "Nuvarande toppström inkommande faser huvudsäkringar ofiltrerat"
-        #unique_id: "energy_momentary_max_phase_current_main_fuses_unfiltered"
+        unique_id: 3b4b7da7-ee15-44b9-a085-5caf25731ec5
         unit_of_measurement: "A"
-        state: "{%set mylist = states('sensor.current_phase_1'),states('sensor.current_phase_2'),states('sensor.current_phase_3')%}{{ mylist|max |int }}"
-  - sensor:
-      - name: "Pelletspris per kWh"
-        unit_of_measurement: "öre"
-        state: >
-          {{ (((states('input_number.pelletssackar_pris') | float / 16) / 0.91 ) / 4.8 * 100 ) | round(2) }}
-        # Pannans verkningsgrad 91%, Pellets 4,8 kWh/kg, 16kg pellets per säck
-  - sensor:
-      - name: "Beräkning slut på pellets"
-        unit_of_measurement: "dagar"
-        state: >
-          {{ ((states.counter.pelletssackar_lager.state|int+states.sensor.pelletsackar_i_veckoforrad.state|float)*16/max((states.sensor.daily_pellets.attributes.last_period|float),(states.sensor.daily_pellets.state|float),(states.sensor.weekly_pellets.state|float/7),(states.sensor.weekly_pellets.attributes.last_period|float/7)))|round(0) }}
+        state: "{%set mylist = states('sensor.current_phase_1'),states('sensor.current_phase_2'),states('sensor.current_phase_3')%}{{ mylist|max |int(16) }}"
+
 sensor:
   - platform: filter
     name: "Nuvarande toppström inkommande faser huvudsäkringar"

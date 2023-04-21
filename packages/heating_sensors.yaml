@@ -16,17 +16,17 @@ template:
           {{ states('sensor.temperature_mean_last_month')|int < 17 }}
           {% endif %}
 
-sensor:
+#sensor:
   # Utjämnad pelletskurva
-  - platform: filter
-    name: "Filtered Pellet Level"
-    entity_id: sensor.pellet_level
-    filters:
-      - filter: time_simple_moving_average
-        window_size: 20
-      - filter: lowpass
-        time_constant: 20
-        precision: 0
+  # - platform: filter
+  #   name: "Filtered Pellet Level"
+  #   entity_id: sensor.pellet_level
+  #   filters:
+  #     - filter: time_simple_moving_average
+  #       window_size: 20
+  #     - filter: lowpass
+  #       time_constant: 20
+  #       precision: 0
 
 # Trend panntemperatur
 binary_sensor:
