@@ -1,0 +1,221 @@
+substitutions:
+# Change the disp_name to something you want  
+  disp_name: Powermeter
+# Interval of how often the power is updated
+  update_time: 10s
+# Current Transformers:
+#  20A/25mA SCT-006: 11143
+#  30A/1V SCT-013-030: 8650
+#  50A/1V SCT-013-050: 15420
+#  50A/16.6mA SCT-010: 41334
+#  80A/26.6mA SCT-010: 41660
+#  100A/50ma SCT-013-000: 27518
+#  120A/40mA: SCT-016: 41787
+#  200A/100mA SCT-024: 27518
+#  200A/50mA SCT-024: 55036
+  current_cal: '27518'
+# Jameco 9VAC Transformer: 42620
+  voltage_cal: '42620'
+
+esphome:
+  name: powermeter
+  platform: ESP32
+  board: nodemcu-32s
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  manual_ip:
+    static_ip: 192.168.10.66
+    gateway: 192.168.10.1
+    subnet: 255.255.255.0
+
+# mqtt:
+#  broker: !secret mqtt_broker
+#  username: !secret mqtt_user
+#  password: !secret mqtt_pass
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+web_server:
+  port: 80
+  include_internal: true
+
+spi:
+  clk_pin: 18
+  miso_pin: 19
+  mosi_pin: 23
+
+sensor:
+  - platform: wifi_signal
+    name: ${disp_name} WiFi
+    update_interval: 60s
+
+  - platform: homeassistant
+    name: "Voltage Phase 1"
+    id: voltage_phase_1
+    entity_id: sensor.voltage_phase_1
+    
+  - platform: homeassistant
+    name: "Voltage Phase 2"
+    id: voltage_phase_2
+    entity_id: sensor.voltage_phase_2
+    
+  - platform: homeassistant
+    name: "Voltage Phase 3"
+    id: voltage_phase_3
+    entity_id: sensor.voltage_phase_3
+#IC1
+  - platform: atm90e32
+    cs_pin: 5
+    phase_a:
+      voltage:
+        name: ${disp_name} Volts A
+        id: ic1Volts
+        accuracy_decimals: 1
+#        filters:
+#          - multiply: 2.0
+      current:
+        name: ${disp_name} CT1 Amps
+        id: ct1Amps
+# The max value for current that the meter can output is 65.535. If you expect to measure current over 65A, 
+# divide the gain_ct by 2 (120A CT) or 4 (200A CT) and multiply the current value by 2 or 4 by uncommenting the filter below
+#        filters:
+#          - multiply: 2.0
+      gain_voltage: ${voltage_cal}
+# Voltage using a 9VAC power transformer
+# Note: If you can not get the voltage correct with the highest gain of 65535, uncomment the 2.0 multiply filter above and lower the gain as needed
+      gain_ct: ${current_cal}
+    phase_b:
+      current:
+        name: ${disp_name} CT2 Amps
+        id: ct2Amps
+      gain_ct: ${current_cal}
+    phase_c:
+      current:
+        name: ${disp_name} CT3 Amps
+        id: ct3Amps
+      gain_ct: ${current_cal}
+    frequency:
+      name: ${disp_name} Freq A
+    line_frequency: 50Hz
+    gain_pga: 1X
+    update_interval: ${update_time}
+#IC2
+  - platform: atm90e32
+    cs_pin: 4
+    phase_a:
+      voltage:
+        name: ${disp_name} Volts B
+        id: ic2Volts
+        accuracy_decimals: 1
+      current:
+        name: ${disp_name} CT4 Amps
+        id: ct4Amps
+      gain_voltage: ${voltage_cal}
+      gain_ct: ${current_cal}
+    phase_b:
+      current:
+        name: ${disp_name} CT5 Amps
+        id: ct5Amps
+      gain_ct: ${current_cal}
+    phase_c:
+      current:
+        name: ${disp_name} CT6 Amps
+        id: ct6Amps
+      gain_ct: ${current_cal}
+    frequency:
+      name: ${disp_name} Freq B
+    line_frequency: 50Hz
+    gain_pga: 1X
+    update_interval: ${update_time}
+    
+#Watts per channel
+  - platform: template
+    name: ${disp_name} CT1 Watts
+    id: ct1Watts
+    #lambda: return id(ct1Amps).state * id(ic1Volts).state;
+    lambda: return id(ct1Amps).state * id(voltage_phase_1).state;
+    accuracy_decimals: 0
+    unit_of_measurement: W
+    device_class: power
+    update_interval: ${update_time}         
+  - platform: template
+    name: ${disp_name} CT2 Watts
+    id: ct2Watts
+    lambda: return id(ct2Amps).state * id(ic1Volts).state;
+    accuracy_decimals: 0
+    unit_of_measurement: W
+    device_class: power
+    update_interval: ${update_time}         
+  - platform: template
+    name: ${disp_name} CT3 Watts
+    id: ct3Watts
+    lambda: return id(ct3Amps).state * id(ic1Volts).state;
+    accuracy_decimals: 0
+    unit_of_measurement: W
+    device_class: power
+    update_interval: ${update_time}         
+  - platform: template
+    name: ${disp_name} CT4 Watts
+    id: ct4Watts
+    lambda: return id(ct4Amps).state * id(ic2Volts).state;
+    accuracy_decimals: 0
+    unit_of_measurement: W
+    device_class: power
+    update_interval: ${update_time}         
+  - platform: template
+    name: ${disp_name} CT5 Watts
+    id: ct5Watts
+    lambda: return id(ct5Amps).state * id(ic2Volts).state;
+    accuracy_decimals: 0
+    unit_of_measurement: W
+    device_class: power
+    update_interval: ${update_time}         
+  - platform: template
+    name: ${disp_name} CT6 Watts
+    id: ct6Watts
+    lambda: return id(ct6Amps).state * id(ic2Volts).state;
+    accuracy_decimals: 0
+    unit_of_measurement: W
+    device_class: power
+    update_interval: ${update_time}         
+#Total Amps   
+  - platform: template
+    name: ${disp_name} Total Amps
+    id: totalAmps
+    lambda: return id(ct1Amps).state + id(ct2Amps).state + id(ct3Amps).state + id(ct4Amps).state + id(ct5Amps).state + id(ct6Amps).state ;
+    accuracy_decimals: 2
+    unit_of_measurement: A
+    device_class: current
+    update_interval: ${update_time}         
+#Total Watts
+  - platform: template
+    name: ${disp_name} Total Watts
+    id: totalWatts
+    lambda: return id(totalAmps).state * id(ic1Volts).state;
+    accuracy_decimals: 1
+    unit_of_measurement: W
+    device_class: power
+    update_interval: ${update_time}
+#kWh
+  - platform: total_daily_energy
+    name: ${disp_name} Total kWh
+    power_id: totalWatts
+    filters:
+      - multiply: 0.001
+    unit_of_measurement: kWh
+    device_class: energy
+    state_class: total_increasing
+switch:
+  - platform: restart
+    name: ${disp_name} Restart  
+time:
+  - platform: sntp
+    id: sntp_time   

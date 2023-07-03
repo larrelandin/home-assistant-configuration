@@ -39,9 +39,9 @@
       subnet: 255.255.255.0
 
     # Enable fallback hotspot (captive portal) in case wifi connection fails
-    ap:
-      ssid: ${device_name}
-      ap_timeout: 15s
+    # ap:
+    #   ssid: ${device_name}
+    #   ap_timeout: 15s
 
   captive_portal:
 

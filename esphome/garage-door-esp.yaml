@@ -29,6 +29,10 @@ wifi:
     gateway: 192.168.10.1
     subnet: 255.255.255.0
 
+text_sensor:
+  - platform: version
+    name: "ESPHome Version"
+
 output:
   - platform: gpio
     pin: GPIO0
