@@ -2,13 +2,15 @@ sensor:
   - platform: rest
     resource: "https://opendata-download-metobs.smhi.se/api/version/1.0/parameter/5/station/53430/period/latest-day/data.json"
     name: Regn Lund
+    unique_id: e1abac16-b4fd-4b61-b547-292e460bb19e
     authentication: basic
     headers:
       User-Agent: Home Assistant
       Content-Type: application/json
     scan_interval: 3600
-    value_template: "{{ value_json.value.0.value if int(value_json.value.0.value) > 0 }}"
+    value_template: "{{ (value_json.value.0.value) | float }}"
     unit_of_measurement: "mm"
+    device_class: precipitation
 
   - platform: statistics
     name: Regn Lund senaste 7 dagar
