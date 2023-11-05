@@ -1,4 +1,4 @@
-nordpool:
+#nordpool:
 
 sensor:
   - platform: nordpool
@@ -34,9 +34,9 @@ sensor:
     # this way we can calculate the correct costs add that to graphs etc.
     # The price result of the additional_costs template expects this additional cost to be in kWh and not cents as a float
     # default {{0.0|float}}
-    # Elöverföring 24.5 öre/kWh
-    # Energiskatt 49 öre/kWh
-    additional_costs: "{{ ((0.245|float) + (0.49|float)) * 1.25 }}"
+    # Elöverföring 15 öre/kWh
+    # Energiskatt 39.2 öre/kWh
+    additional_costs: "{{ ((0.15|float) + (0.392|float)) * 1.25 }}"
 
 template:
   - sensor:
