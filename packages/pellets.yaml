@@ -32,7 +32,7 @@ template:
         state: >
           {{ ((states.counter.pelletssackar_lager.state|int+states.sensor.pelletsackar_i_veckoforrad.state|float)*16/max((states.sensor.daily_pellets.attributes.last_period|float),(states.sensor.daily_pellets.state|float),(states.sensor.weekly_pellets.state|float/7),(states.sensor.weekly_pellets.attributes.last_period|float/7)))|round(0) }}
   - sensor:
-      - name: "Pellets konsumption energi"
+      - name: "Panna konsumtion pellets"
         unit_of_measurement: kWh
         unique_id: 0d3ec94c-ad46-478d-8908-66b55eb496bb
         state_class: total_increasing

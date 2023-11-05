@@ -4,6 +4,10 @@ template:
         unique_id: 3b4b7da7-ee15-44b9-a085-5caf25731ec5
         unit_of_measurement: "A"
         state: "{%set mylist = states('sensor.current_phase_1'),states('sensor.current_phase_2'),states('sensor.current_phase_3')%}{{ mylist|max |int(16) }}"
+      - name: "Effekt elmätare"
+        unique_id: 214a30a7-a59d-4a55-8833-4196137c1677
+        unit_of_measurement: "W"
+        state: "{{ ((states('sensor.power_produced')|float - states('sensor.power_consumed')|float) * 1000) | round(0)}}"
 
 sensor:
   - platform: filter
@@ -12,7 +16,7 @@ sensor:
     #unique_id: "energy_momentary_max_phase_current_main_fuses"
     filters:
       - filter: time_moving_max
-        window_size: "00:05"
+        window_size: "00:02"
       # - filter: outlier
       #   window_size: 3
       #   radius: 2.0
@@ -22,6 +26,6 @@ sensor:
 
 utility_meter:
   energy_consumption_hourly:
-    name: Energikonsumption per timme
+    name: Elkonsumtion per timme
     source: sensor.energy_consumed_luxembourg
     cycle: hourly
