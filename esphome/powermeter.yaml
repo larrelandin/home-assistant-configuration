@@ -19,6 +19,7 @@ substitutions:
 
 esphome:
   name: powermeter
+  comment: "https://circuitsetup.us"
   platform: ESP32
   board: nodemcu-32s
 
@@ -61,24 +62,33 @@ sensor:
     name: "Voltage Phase 1"
     id: voltage_phase_1
     entity_id: sensor.voltage_phase_1
+    filters:
+      - lambda: if(isnan(x)) return {230};
+                return x;
     
   - platform: homeassistant
     name: "Voltage Phase 2"
     id: voltage_phase_2
     entity_id: sensor.voltage_phase_2
+    filters:
+      - lambda: if(isnan(x)) return {230};
+                return x;
     
   - platform: homeassistant
     name: "Voltage Phase 3"
     id: voltage_phase_3
     entity_id: sensor.voltage_phase_3
+    filters:
+      - lambda: if(isnan(x)) return {230};
+                return x;
 #IC1
   - platform: atm90e32
     cs_pin: 5
     phase_a:
-      voltage:
-        name: ${disp_name} Volts A
-        id: ic1Volts
-        accuracy_decimals: 1
+      # voltage:
+        # name: ${disp_name} Volts A
+        # id: ic1Volts
+        # accuracy_decimals: 1
 #        filters:
 #          - multiply: 2.0
       current:
@@ -111,10 +121,10 @@ sensor:
   - platform: atm90e32
     cs_pin: 4
     phase_a:
-      voltage:
-        name: ${disp_name} Volts B
-        id: ic2Volts
-        accuracy_decimals: 1
+      # voltage:
+      #   name: ${disp_name} Volts B
+      #   id: ic2Volts
+      #   accuracy_decimals: 1
       current:
         name: ${disp_name} CT4 Amps
         id: ct4Amps
@@ -130,62 +140,62 @@ sensor:
         name: ${disp_name} CT6 Amps
         id: ct6Amps
       gain_ct: ${current_cal}
-    frequency:
-      name: ${disp_name} Freq B
+  #   frequency:
+  #     name: ${disp_name} Freq B
     line_frequency: 50Hz
     gain_pga: 1X
     update_interval: ${update_time}
     
 #Watts per channel
-  - platform: template
-    name: ${disp_name} CT1 Watts
-    id: ct1Watts
-    #lambda: return id(ct1Amps).state * id(ic1Volts).state;
-    lambda: return id(ct1Amps).state * id(voltage_phase_1).state;
-    accuracy_decimals: 0
-    unit_of_measurement: W
-    device_class: power
-    update_interval: ${update_time}         
-  - platform: template
-    name: ${disp_name} CT2 Watts
-    id: ct2Watts
-    lambda: return id(ct2Amps).state * id(ic1Volts).state;
-    accuracy_decimals: 0
-    unit_of_measurement: W
-    device_class: power
-    update_interval: ${update_time}         
-  - platform: template
-    name: ${disp_name} CT3 Watts
-    id: ct3Watts
-    lambda: return id(ct3Amps).state * id(ic1Volts).state;
-    accuracy_decimals: 0
-    unit_of_measurement: W
-    device_class: power
-    update_interval: ${update_time}         
-  - platform: template
-    name: ${disp_name} CT4 Watts
-    id: ct4Watts
-    lambda: return id(ct4Amps).state * id(ic2Volts).state;
-    accuracy_decimals: 0
-    unit_of_measurement: W
-    device_class: power
-    update_interval: ${update_time}         
-  - platform: template
-    name: ${disp_name} CT5 Watts
-    id: ct5Watts
-    lambda: return id(ct5Amps).state * id(ic2Volts).state;
-    accuracy_decimals: 0
-    unit_of_measurement: W
-    device_class: power
-    update_interval: ${update_time}         
-  - platform: template
-    name: ${disp_name} CT6 Watts
-    id: ct6Watts
-    lambda: return id(ct6Amps).state * id(ic2Volts).state;
-    accuracy_decimals: 0
-    unit_of_measurement: W
-    device_class: power
-    update_interval: ${update_time}         
+  # - platform: template
+  #   name: ${disp_name} CT1 Watts
+  #   id: ct1Watts
+  #   lambda: return id(ct1Amps).state * id(voltage_phase_1).state;
+  #   accuracy_decimals: 0
+  #   unit_of_measurement: W
+  #   device_class: power
+  #   update_interval: ${update_time}         
+  # - platform: template
+  #   name: ${disp_name} CT2 Watts
+  #   id: ct2Watts
+  #   lambda: return id(ct2Amps).state * id(voltage_phase_2).state;
+  #   accuracy_decimals: 0
+  #   unit_of_measurement: W
+  #   device_class: power
+  #   update_interval: ${update_time}         
+  # - platform: template
+  #   name: ${disp_name} CT3 Watts
+  #   id: ct3Watts
+  #   lambda: return id(ct3Amps).state * id(voltage_phase_3).state;
+  #   accuracy_decimals: 0
+  #   unit_of_measurement: W
+  #   device_class: power
+  #   update_interval: ${update_time}         
+  # - platform: template
+  #   name: ${disp_name} CT4 Watts
+  #   id: ct4Watts
+  #   lambda: return id(ct4Amps).state * id(voltage_phase_2).state;
+  #   accuracy_decimals: 0
+  #   unit_of_measurement: W
+  #   device_class: power
+  #   update_interval: ${update_time}        
+  # - platform: template
+  #   name: ${disp_name} CT5 Watts
+  #   id: ct5Watts
+  #   lambda: return id(ct5Amps).state * id(voltage_phase_1).state;
+  #   accuracy_decimals: 0
+  #   unit_of_measurement: W
+  #   device_class: power
+  #   update_interval: ${update_time}         
+  # - platform: template
+  #   name: ${disp_name} CT6 Watts
+  #   id: ct6Watts
+  #   lambda: return id(ct6Amps).state * id(voltage_phase_2).state;
+  #   accuracy_decimals: 0
+  #   unit_of_measurement: W
+  #   device_class: power
+  #   update_interval: ${update_time}   
+
 #Total Amps   
   - platform: template
     name: ${disp_name} Total Amps
@@ -199,7 +209,7 @@ sensor:
   - platform: template
     name: ${disp_name} Total Watts
     id: totalWatts
-    lambda: return id(totalAmps).state * id(ic1Volts).state;
+    lambda: return id(totalAmps).state * id(voltage_phase_1).state;
     accuracy_decimals: 1
     unit_of_measurement: W
     device_class: power
@@ -213,6 +223,120 @@ sensor:
     unit_of_measurement: kWh
     device_class: energy
     state_class: total_increasing
+
+#Diskmaskin Amps   
+  - platform: template
+    name: Diskmaskin Ampere
+    id: diskmaskinAmp
+    lambda: return id(ct4Amps).state;
+    accuracy_decimals: 2
+    unit_of_measurement: A
+    device_class: current
+    update_interval: ${update_time}
+#Diskmaskin Watts
+  - platform: template
+    name: Diskmaskin Watt
+    id: diskmaskinWatt
+    lambda: return id(diskmaskinAmp).state * id(voltage_phase_2).state;
+    accuracy_decimals: 1
+    unit_of_measurement: W
+    device_class: power
+    update_interval: ${update_time}
+#Diskmaskin kWh
+  - platform: total_daily_energy
+    name: Diskmaskin Energi
+    power_id: diskmaskinWatt
+    filters:
+      - multiply: 0.001
+    unit_of_measurement: kWh
+    device_class: energy
+    state_class: total_increasing
+
+#Kyl Amps   
+  - platform: template
+    name: Kyl kök Ampere
+    id: kylAmp
+    lambda: return id(ct5Amps).state;
+    accuracy_decimals: 2
+    unit_of_measurement: A
+    device_class: current
+    update_interval: ${update_time}
+#Kyl Watts
+  - platform: template
+    name: Kyl kök Watt
+    id: kylWatt
+    lambda: return id(kylAmp).state * id(voltage_phase_1).state;
+    accuracy_decimals: 1
+    unit_of_measurement: W
+    device_class: power
+    update_interval: ${update_time}
+#Kyl kWh
+  - platform: total_daily_energy
+    name: Kyl kök Energi
+    power_id: kylWatt
+    filters:
+      - multiply: 0.001
+    unit_of_measurement: kWh
+    device_class: energy
+    state_class: total_increasing
+
+#Panna Amps   
+  - platform: template
+    name: Panna Ampere
+    id: pannaAmp
+    lambda: return id(ct1Amps).state + id(ct2Amps).state + id(ct3Amps).state;
+    accuracy_decimals: 2
+    unit_of_measurement: A
+    device_class: current
+    update_interval: ${update_time}         
+#Panna Watts
+  - platform: template
+    name: Panna Watt
+    id: pannaWatt
+    lambda: return id(pannaAmp).state * id(voltage_phase_1).state;
+    accuracy_decimals: 1
+    unit_of_measurement: W
+    device_class: power
+    update_interval: ${update_time}
+#Panna kWh
+  - platform: total_daily_energy
+    name: Panna konsumtion el
+    power_id: pannaWatt
+    filters:
+      - multiply: 0.001
+    unit_of_measurement: kWh
+    device_class: energy
+    state_class: total_increasing
+
+#Ugn och Frys Amps   
+  - platform: template
+    name: Ugn och Frys Ampere
+    id: ugnFrysAmp
+    lambda: return id(ct6Amps).state;
+    accuracy_decimals: 2
+    unit_of_measurement: A
+    device_class: current
+    update_interval: ${update_time}         
+#Ugn och Frys Watts
+  - platform: template
+    name: Ugn och Frys Watt
+    id: ugnFrysWatt
+    lambda: return id(ugnFrysAmp).state * id(voltage_phase_2).state;
+    accuracy_decimals: 1
+    unit_of_measurement: W
+    device_class: power
+    update_interval: ${update_time}
+#Ugn och Frys kWh
+  - platform: total_daily_energy
+    name: Ugn och Frys Energi
+    power_id: ugnFrysWatt
+    filters:
+      - multiply: 0.001
+    unit_of_measurement: kWh
+    device_class: energy
+    state_class: total_increasing
+
+
 switch:
   - platform: restart
     name: ${disp_name} Restart  
