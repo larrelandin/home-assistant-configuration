@@ -12,7 +12,7 @@ climate:
 thermal_comfort:
   - custom_icons: false
     sensor:
-    - name: "Poolhus Thermal Sensor"
-      unique_id: 5aace9ad-3bba-4cca-beaa-4e0dfd9e6d19
-      temperature_sensor: sensor.temperatur_poolhus
-      humidity_sensor: sensor.fukt_poolhus
+      - name: "Poolhus Thermal Sensor"
+        unique_id: 5aace9ad-3bba-4cca-beaa-4e0dfd9e6d19
+        temperature_sensor: sensor.temperatur_poolhus
+        humidity_sensor: sensor.fukt_poolhus
