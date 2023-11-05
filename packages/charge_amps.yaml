@@ -16,7 +16,7 @@ template:
         unique_id: 7ea555a3-6612-42d1-bc52-03510450151e
         state: >
           {% if not is_state('sensor.nuvarande_elpris', 'unavailable') and not is_state('sensor.charge_amps_energy_per_hour', 'unavailable') and not is_state('sensor.nuvarande_elpris', 'unknown') and not is_state('sensor.charge_amps_energy_per_hour', 'unknown') %}
-          {{ states('sensor.nuvarande_elpris') | float * states('sensor.charge_amps_energy_per_hour') | float }}
+          {{ states('sensor.nuvarande_elpris') | float * states('sensor.charge_amps_energy_per_hour') | float * 1.2 }}
           {% endif %}
 
 utility_meter:
