@@ -1,0 +1,60 @@
+esphome:
+  name: jul4-sonoff
+  platform: ESP8266
+  board: esp01_1m
+
+wifi:
+  ssid: 'landin iot'
+  password: !secret landin_iot_wifi_password
+  domain: '.landin.lan'
+  fast_connect: true
+  
+  manual_ip:
+    static_ip: 192.168.10.64
+    gateway: 192.168.10.1
+    subnet: 255.255.255.0
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "kSnWIMQbW+uJbj6AyuyDnn/EStv8f84GwFCM41uj2tk="
+
+ota:
+  password: !secret esp_ota_password
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "Jul4 knapp"
+    id: jul4_button
+    on_press:
+      then:
+        if:
+          condition:
+          - light.is_off: light1
+          then:
+          - light.turn_on: light1
+          - delay: 1h
+          - light.turn_off: light1
+          else:
+            - light.turn_off: light1
+  - platform: status
+    name: "Jul4 Sonoff status"
+    id: jul4_sonoff_status
+
+output:
+  - platform: gpio
+    pin: GPIO12
+    id: relay1
+
+light:
+  - platform: binary
+    name: "Jul4"
+    id: light1
+    output: relay1
