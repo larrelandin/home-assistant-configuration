@@ -8,8 +8,34 @@ sensor:
         max_journeys: 20
         sensors: 3
         unit: "🕑"
+        time_format: "%H:%M"
         filter:
           - line: 5
-            direction: "Lund Företagsvägen"
+            type: "contains"
+            direction: "annehem"
+      - stop_id: 740016732
+        name: "Bussar från Gastelyckan Ö"
+        max_journeys: 20
+        sensors: 6
+        unit: "🕑"
+        time_format: "%H:%M"
+        filter:
+          - direction: "Lund C"
+      - stop_id: 740016981
+        name: "Bussar från Botulfsplatsen"
+        max_journeys: 20
+        sensors: 3
+        unit: "🕑"
+        time_format: "%H:%M"
+        filter:
           - line: 5
-            direction: "Lund Bondevägen"
+            direction: "Lund Råbylund"
+      - stop_id: 740016757
+        name: "Bussar från Bankgatan"
+        max_journeys: 20
+        sensors: 2
+        unit: "🕑"
+        time_format: "%H:%M"
+        filter:
+          - line: 161
+          - line: 162
