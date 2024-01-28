@@ -21,19 +21,11 @@ default_config:
 recorder:
   db_url: !secret connectionstring_mariadb
   purge_keep_days: 30
-
-# Sensors
-sensor:
-  ### system monitor ###
-  - platform: systemmonitor
-    resources:
-      - type: disk_use_percent
-        arg: /
-      - type: disk_free
-        arg: /
-      - type: memory_use_percent
-      - type: last_boot
-      - type: processor_use
+  exclude:
+    entities:
+      - sensor.helper_bussar_fran_gastelyckan_o
+      - sensor.helper_buss_till_botulfsplatsen
+      - sensor.helper_bussar_fran_botulfsplatsen
 
 swedish_calendar:
 
