@@ -1,5 +1,13 @@
 ios:
   actions:
+    - name: Unlock garage
+      background_color: "#000000"
+      label:
+        text: "Låser upp garaget"
+        color: "#ff0000"
+      icon:
+        icon: lock-open-variant
+        color: "#ffffff"
     - name: Goodnight House
       background_color: "#000000"
       label:
@@ -72,3 +80,4 @@ ios:
       icon:
         icon: lightbulb-off
         color: "#ffffff"
+
