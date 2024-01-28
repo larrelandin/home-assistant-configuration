@@ -1,13 +1,6 @@
 # Note that this integration is dependent on the remote_homeassistant integration as the sensors are coming from that remote HA instance
 
 template:
-  # - sensor:
-  #     - name: "pv_daily_yield"
-  #       unit_of_measurement: "kWh"
-  #       device_class: energy
-  #       icon: mdi:solar-power
-  #       state: "{{ states('sensor.inverter_daily_yield') }}"
-
   - sensor:
       - name: "Solarpanels production"
         unit_of_measurement: "kWh"
@@ -18,20 +11,14 @@ template:
         attributes:
           last_reset: "1970-01-01T00:00:00+00:00"
 
-  # - sensor:
-  #     - name: "consumption"
-  #       unit_of_measurement: "kW"
-  #       icon: mdi:solar-power
-  #       state: "{{ states('sensor.solarbridge_sun2000_10ktl_m1') |float - states('sensor.inverter_pv_active_power') | float }}"
-
   - sensor:
       - name: "pv_string_02_power"
         unit_of_measurement: "kW"
         icon: mdi:solar-power
-        state: "{{ states('sensor.inverter_pv_string_02_voltage') |float * states('sensor.inverter_pv_string_02_current') | float / 1000|round(2) }}"
+        state: "{{ states('sensor.inverter_pv_string_02_voltage') | float(0) * states('sensor.inverter_pv_string_02_current') | float(0) / 1000|round(2) }}"
 
   - sensor:
       - name: "pv_string_01_power"
         unit_of_measurement: "kW"
         icon: mdi:solar-power
-        state: "{{ states('sensor.inverter_pv_string_01_voltage') |float * states('sensor.inverter_pv_string_01_current') | float / 1000|round(2) }}"
+        state: "{{ states('sensor.inverter_pv_string_01_voltage') | float(0) * states('sensor.inverter_pv_string_01_current') | float(0) / 1000|round(2) }}"

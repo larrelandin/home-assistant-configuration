@@ -7,7 +7,7 @@ template:
       - name: "Effekt elmätare"
         unique_id: 214a30a7-a59d-4a55-8833-4196137c1677
         unit_of_measurement: "W"
-        state: "{{ ((states('sensor.power_produced')|float - states('sensor.power_consumed')|float) * 1000) | round(0)}}"
+        state: "{{ ((states('sensor.power_produced')|float(0) - states('sensor.power_consumed')|float(0)) * 1000) | round(0)}}"
 
 sensor:
   - platform: filter

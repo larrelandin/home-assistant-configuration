@@ -30,7 +30,7 @@ template:
         unit_of_measurement: "dagar"
         unique_id: a2ab8cc7-502f-4383-b286-30d1cc0925f1
         state: >
-          {{ ((states.counter.pelletssackar_lager.state|int+states.sensor.pelletsackar_i_veckoforrad.state|float)*16/max((states.sensor.daily_pellets.attributes.last_period|float),(states.sensor.daily_pellets.state|float),(states.sensor.weekly_pellets.state|float/7),(states.sensor.weekly_pellets.attributes.last_period|float/7)))|round(0) }}
+          {{ ((states.counter.pelletssackar_lager.state | int(0) + states.sensor.pelletsackar_i_veckoforrad.state | float(0)) * 16 / max((states.sensor.daily_pellets.attributes.last_period | float(0)),(states.sensor.daily_pellets.state | float(0)),(states.sensor.weekly_pellets.state | float(0) / 7),(states.sensor.weekly_pellets.attributes.last_period | float(0) / 7))) | round(0) }}
   - sensor:
       - name: "Panna konsumtion pellets"
         unit_of_measurement: kWh
