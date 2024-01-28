@@ -8,7 +8,12 @@ sensor:
       User-Agent: Home Assistant
       Content-Type: application/json
     scan_interval: 3600
-    value_template: "{{ (value_json.value.0.value) | float }}"
+    value_template: >
+      {% if value_json.value is defined and value_json.value.0 is defined and value_json.value.0.value is defined %}
+        {{ (value_json.value.0.value) | float(0) }}
+      {% else %}
+        {{ 0 | float }}
+      {% endif %}
     unit_of_measurement: "mm"
     device_class: precipitation
 
@@ -16,6 +21,7 @@ sensor:
     name: Regn Lund senaste 7 dagar
     state_characteristic: total
     entity_id: sensor.regn_lund
+    unique_id: 6b98df2a-6955-4d0b-83ea-d30203b31906
     max_age:
       days: 7
     sampling_size: 50
