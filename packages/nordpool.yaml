@@ -1,7 +1,7 @@
 #nordpool:
 
 sensor:
-  - platform: nordpool
+  - platform: nordpool #Inbound electricity
 
     # Should the prices include vat? Default True
     VAT: True
@@ -34,9 +34,19 @@ sensor:
     # this way we can calculate the correct costs add that to graphs etc.
     # The price result of the additional_costs template expects this additional cost to be in kWh and not cents as a float
     # default {{0.0|float}}
-    # Elöverföring 15 öre/kWh
-    # Energiskatt 39.2 öre/kWh
-    additional_costs: "{{ ((0.15|float) + (0.392|float)) * 1.25 }}"
+    # Elöverföring 20 + 0,0561 x elspotpriset inkl. moms öre/kWh.
+    # Energiskatt 53.5 öre/kWh (66.875 öre/kWh inkl. moms)
+    additional_costs: "{{ (0.20|float) + ((0.0561 * current_price)|float) + (0.66875|float) }}"
+
+  - platform: nordpool # Outbound electricity (selling electricity)
+    VAT: false
+    currency: SEK
+    price_in_cents: true
+    low_price_cutoff: 0.95
+    region: "SE4"
+    precision: 4
+    price_type: kWh
+    additional_costs: "{{ (0.60|float) + (0.066|float) }}"
 
 template:
   - sensor:
@@ -45,4 +55,11 @@ template:
         device_class: monetary
         unique_id: "current_electricity_price_kr"
         state: >
-          {{ states('sensor.nordpool_kwh_se4_sek_4_095_025') | float / 100 }}
+          {{ states('sensor.nordpool_inbound_price') | float / 100 }}
+  - sensor:
+      - name: "Nuvarande elpris försäljning"
+        unit_of_measurement: "SEK/kWh"
+        device_class: monetary
+        unique_id: "2e668237-efbd-4a6a-9f62-24336fe582c2"
+        state: >
+          {{ states('sensor.nordpool_outbound_price') | float / 100 }}

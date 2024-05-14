@@ -7,6 +7,11 @@ homeassistant:
       trusted_networks:
         - 172.30.32.0/23
         - 192.168.10.0/24
+        - 192.168.10.40/32 #Google Home Kök
+      trusted_users:
+        192.168.10.40: 2bdf5d1522524220aab7e2d3359f9adf #CCD
+        192.168.10.136: d533fc5016334f9ea95e79d94dbbc3d5 #Larre
+      allow_bypass_login: true
 
 http:
   use_x_forwarded_for: true

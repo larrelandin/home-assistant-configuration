@@ -7,7 +7,8 @@ sensor:
     headers:
       User-Agent: Home Assistant
       Content-Type: application/json
-    scan_interval: 3600
+    scan_interval: 172000
+    # Called once per day at 07.15 from automation
     value_template: >
       {% if value_json.value is defined and value_json.value.0 is defined and value_json.value.0.value is defined %}
         {{ (value_json.value.0.value) | float(0) }}

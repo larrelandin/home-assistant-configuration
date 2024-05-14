@@ -1,13 +1,16 @@
 sensor:
   - platform: history_stats
     name: Pool circulation active daytime
+    unique_id: cb5f0ef5-dabf-4899-b52f-19e47d7ac44c
     entity_id: switch.cirk_pump_pool
     state: "on"
     type: time
-    start: "{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}"
+    start: "{{ today_at() }}"
+    end: "{{ now() }}"
+    #start: "{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}"
     #end: "{{ now().replace(hour=20, minute=0, second=0, microsecond=0) }}"
-    duration:
-      hours: 24
+    #duration:
+    #  hours: 24
 
 template:
   - binary_sensor:
@@ -15,3 +18,63 @@ template:
         state: >
           {{ states('sensor.ow_pool_temp_rounded')|float < 16 }}
         unique_id: 68821f3c-8ec7-4e56-a938-03842faa90cf
+  - sensor:
+      - name: Pool elkostnad nu
+        unit_of_measurement: "SEK"
+        unique_id: 86640ace-1e7b-4c49-89de-644813eddac0
+        state: >
+          {{ states('sensor.cirkulationspump_pool_elkostnad_nu') | float(0) + states('sensor.varmepump_pool_elkostnad_nu') | float(0) }}
+      - name: Värmepump pool elkostnad nu
+        unit_of_measurement: "SEK"
+        unique_id: 99b0916d-0e8d-4568-b7e3-59524584bb30
+        state: >
+          {% if not is_state('sensor.nuvarande_elpris', 'unavailable') and not is_state('sensor.varmepump_pool_energy_per_hour', 'unavailable') and not is_state('sensor.nuvarande_elpris', 'unknown') and not is_state('sensor.varmepump_pool_energy_per_hour', 'unknown') %}
+          {{ states('sensor.nuvarande_elpris') | float * states('sensor.varmepump_pool_energy_per_hour') | float }}
+          {% endif %}
+      - name: Cirkulationspump pool elkostnad nu
+        unit_of_measurement: "SEK"
+        unique_id: aaeb8a84-34f3-4bf6-bf56-3a48d67573ef
+        state: >
+          {% if not is_state('sensor.nuvarande_elpris', 'unavailable') and not is_state('sensor.cirkulationspump_pool_energy_per_hour', 'unavailable') and not is_state('sensor.nuvarande_elpris', 'unknown') and not is_state('sensor.cirkulationspump_pool_energy_per_hour', 'unknown') %}
+          {{ states('sensor.nuvarande_elpris') | float * states('sensor.cirkulationspump_pool_energy_per_hour') | float }}
+          {% endif %}
+  - sensor:
+      - name: Pool elkostnad igår
+        unit_of_measurement: "SEK"
+        unique_id: f7cd09e5-4213-4caa-b426-1a598e623bd2
+        state: >
+          {{ state_attr('sensor.daglig_elkostnad_pool', 'last_period') | float }}
+
+utility_meter:
+  cirkulationspump_pool_energy_per_hour:
+    source: sensor.cirk_pump_energy
+    unique_id: 58f4ca46-845b-4680-8737-471b94ec719c
+    cycle: hourly
+  varmepump_pool_energy_per_hour:
+    source: sensor.varmepump_energy
+    unique_id: bd8c3a55-f7c5-487e-9cb6-115dc7b6adc6
+    cycle: hourly
+  daglig_elkostnad_varmepump_pool:
+    source: sensor.varmepump_pool_elkostnad_nu
+    unique_id: 5a7205b7-45ae-43df-a19f-8ac9e2d651a1
+    cycle: daily
+  arlig_elkostnad_varmepump_pool:
+    source: sensor.varmepump_pool_elkostnad_nu
+    unique_id: 5a7205b7-45ae-43df-a19f-8ac9e2d651a1
+    cycle: yearly
+  daglig_elkostnad_cirkulationspump_pool:
+    source: sensor.cirkulationspump_pool_elkostnad_nu
+    unique_id: 62a95dd3-0c54-4dc2-a776-506c414f578c
+    cycle: daily
+  arlig_elkostnad_cirkulationspump_pool:
+    source: sensor.cirkulationspump_pool_elkostnad_nu
+    unique_id: 2bf5dded-5ee5-4f12-9534-72bb9a067614
+    cycle: yearly
+  daglig_elkostnad_pool:
+    source: sensor.pool_elkostnad_nu
+    unique_id: aebc8b46-4963-46c6-83f6-557d6c007368
+    cycle: daily
+  arlig_elkostnad_pool:
+    source: sensor.pool_elkostnad_nu
+    unique_id: 00b870e8-7472-4fb4-a676-3887f0be77a7
+    cycle: yearly
