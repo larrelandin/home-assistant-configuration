@@ -1,0 +1,16 @@
+proxmoxve:
+  - host: 192.168.10.9
+    username: hass@pve
+    password: "%bDe@Yj^JnLJOAp2T"
+    verify_ssl: false
+    realm: pve
+    nodes:
+      - node: proxmox
+        containers:
+          - 104
+      - node: proxmox2
+        vms:
+          - 100
+        containers:
+          - 101
+          - 102

@@ -56,7 +56,7 @@ utility_meter:
     cycle: hourly
   daglig_elkostnad_varmepump_pool:
     source: sensor.varmepump_pool_elkostnad_nu
-    unique_id: 5a7205b7-45ae-43df-a19f-8ac9e2d651a1
+    unique_id: 05021728-8f5e-4fa9-9598-61dd7db35305
     cycle: daily
   arlig_elkostnad_varmepump_pool:
     source: sensor.varmepump_pool_elkostnad_nu

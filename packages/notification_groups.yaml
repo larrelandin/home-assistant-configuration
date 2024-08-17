@@ -2,7 +2,7 @@ notify:
   - platform: group
     name: "Larre_phone"
     services:
-      - service: mobile_app_larres_iphone_13
+      - service: mobile_app_larres_iphone_15
   - platform: group
     name: "Larre_slack"
     services:
