@@ -30,7 +30,8 @@ api:
     key: "E76DlJGoYFrnHyWH6R4Gow70r+RTtaikZf388mEY4wc="
 
 ota:
-  password: !secret esp_ota_password
+  - platform: esphome
+    password: !secret esp_ota_password
 
 # Global to store the on/off state of the chime
 globals:

@@ -23,7 +23,8 @@ api:
     key: "oo444VFnr8UF/QX/EEX1WjgAxbH07jBEhdchYNL/6CE="
 
 ota:
-  password: !secret esp_ota_password
+  - platform: esphome
+    password: !secret esp_ota_password
 
 i2c:
   sda: D2
@@ -31,8 +32,9 @@ i2c:
   scan: true
   id: bus_a
 
-dallas:
-  - pin: D7
+one_wire:
+  - platform: gpio
+    pin: D7
 
 binary_sensor:
   - platform: status
@@ -123,7 +125,7 @@ sensor:
       return id(pellet_sacks_in_bin).state * 16; // Each sack weighs 16Kg
     update_interval: 60s
 
-  - platform: dallas
+  - platform: dallas_temp
     address: 0x0D0008022A1D9710
     name: "Pannrum"
     filters:

@@ -23,7 +23,8 @@ api:
     key: "arGDYu1++wfpPmORIKT+n4cNil1NIvPTyZx+VawFOkk="
 
 ota:
-  password: !secret esp_ota_password
+  - platform: esphome
+    password: !secret esp_ota_password
 
 binary_sensor:
   - platform: status

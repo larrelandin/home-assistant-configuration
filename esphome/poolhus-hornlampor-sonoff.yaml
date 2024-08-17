@@ -23,7 +23,8 @@ api:
     key: "5KIqhkb9fM5PQ3DmA5IipH3pBByaoA22D0G+5K1hhSA="
 
 ota:
-  password: !secret esp_ota_password
+  - platform: esphome
+    password: !secret esp_ota_password
 
 binary_sensor:
   - platform: gpio
