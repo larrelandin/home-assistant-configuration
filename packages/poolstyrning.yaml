@@ -16,7 +16,7 @@ template:
   - binary_sensor:
       - name: För kallt för att bada
         state: >
-          {{ states('sensor.ow_pool_temp_rounded')|float < 16 }}
+          {{ states('sensor.ow_pool_temp')|float < 16 }}
         unique_id: 68821f3c-8ec7-4e56-a938-03842faa90cf
   - sensor:
       - name: Pool elkostnad nu
