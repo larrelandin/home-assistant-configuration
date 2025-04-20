@@ -8,7 +8,12 @@ template:
       - name: "Charge Amps total consumption latest charge kWh"
         unique_id: "charge_amps_total_consumption_latest_charge_kwh"
         unit_of_measurement: "kWh"
-        state: "{% if is_state('sensor.charge_amps_charging_status', 'Charging') %} {{ state_attr('sensor.charge_amps_charging_status', 'total_consumption_kwh') }} {% endif %}"
+        state: >
+          {% if is_state('sensor.charge_amps_charging_status', 'Charging') %}
+            {{ state_attr('sensor.charge_amps_charging_status', 'total_consumption_kwh') }}
+          {% else %}
+            unknown
+          {% endif %}
       - name: "Charge Amps total consumption previous charge kWh"
         unique_id: e7a6f709-59d9-421d-9240-f96564985cac
         unit_of_measurement: "kWh"
