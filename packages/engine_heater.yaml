@@ -58,7 +58,7 @@ automation:
       service: input_number.set_value
       data_template:
         entity_id: input_number.car_heater_estimated_outside_temp
-        value: "{{ states.sensor.ow_outside_temp_rounded.state }}"
+        value: "{{ states.sensor.ow_outside_temp.state }}"
 
   - alias: "Turn on heater if manually started through override"
     trigger:
@@ -98,7 +98,7 @@ automation:
       service: input_number.set_value
       data_template:
         entity_id: input_number.car_heater_estimated_outside_temp
-        value: "{{ states.sensor.ow_outside_temp_rounded.state }}"
+        value: "{{ states.sensor.ow_outside_temp.state }}"
 
   - alias: "Car heater timer disabled"
     trigger:
