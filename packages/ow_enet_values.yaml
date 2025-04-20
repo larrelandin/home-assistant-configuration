@@ -1,61 +1,197 @@
-homeassistant:
-  customize:
-    sensor.ow_pool_techroom_temp:
-      hidden: true
-    sensor.ow_pool_temp:
-      hidden: true
-    sensor.ow_outside_temp:
-      hidden: true
-    sensor.ow_boiler_temp:
-      hidden: true
-    sensor.ow_boiler_out_temp:
-      hidden: true
-    sensor.ow_kitchen_temp:
-      hidden: true
+rest:
+  resource: "http://192.168.10.31/details.xml"
+  scan_interval: 60
+  sensor:
+    - name: "1 wire EDS"
+      unique_id: "owserver"
+      value_template: "{{ value_json['Devices-Detail-Response']['HostName']}}"
+      force_update: true
+      json_attributes_path: "$.['Devices-Detail-Response']"
+      json_attributes:
+        - MACAddress
+        - DeviceName
+        - VoltagePower
+        - DateTime
+        - LoopTime
+        - PollCount
+        - DevicesConnected
+        - DevicesConnectedChannel1
+        - DevicesConnectedChannel2
+        - DevicesConnectedChannel3
+        - VoltageChannel1
+        - VoltageChannel2
+        - VoltageChannel3
+        - DataErrorsChannel1
+        - DataErrorsChannel2
+        - DataErrorsChannel3
 
-# Use MIB Browser on Carson to find OIDs
+    - name: "ow_kitchen_temp"
+      unique_id: owserver.ow_kitchen_temp
+      value_template: "{{ (value_json['Devices-Detail-Response']['owd_DS18S20'] | selectattr('ROMId','==','0B0008027C035E10') | list | first)['Temperature']['#text'] | round(1) }}"
+      force_update: true
+      device_class: temperature
+      unit_of_measurement: "°C"
+      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18S20'][?(@.ROMId =='0B0008027C035E10')]"
+      json_attributes:
+        - Channel
+        - Health
+        - ROMId
+
+    - name: "ow_pool_temp"
+      unique_id: owserver.ow_pool_temp
+      value_template: "{{ (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','DD0119142F965B28') | list | first)['Temperature']['#text'] | round(1) }}"
+      force_update: true
+      device_class: temperature
+      unit_of_measurement: "°C"
+      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18B20'][?(@.ROMId =='DD0119142F965B28')]"
+      json_attributes:
+        - Channel
+        - Health
+        - ROMId
+
+    - name: "ow_pool_techroom_temp"
+      unique_id: owserver.ow_pool_techroom_temp
+      value_template: "{{ (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','F10119143F90B328') | list | first)['Temperature']['#text'] | round(1) }}"
+      force_update: true
+      device_class: temperature
+      unit_of_measurement: "°C"
+      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18B20'][?(@.ROMId =='F10119143F90B328')]"
+      json_attributes:
+        - Channel
+        - Health
+        - ROMId
+
+    - name: "ow_underfloor_return_temp"
+      unique_id: owserver.ow_underfloor_return_temp
+      value_template: "{{ (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','19544D550A646128') | list | first)['Temperature']['#text'] | round(1) }}"
+      force_update: true
+      device_class: temperature
+      unit_of_measurement: "°C"
+      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18B20'][?(@.ROMId =='19544D550A646128')]"
+      json_attributes:
+        - Channel
+        - Health
+        - ROMId
+
+    - name: "ow_underfloor_out_temp"
+      unique_id: owserver.ow_underfloor_out_temp
+      value_template: "{{ (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','E281FF550A646128') | list | first)['Temperature']['#text'] | round(1) }}"
+      force_update: true
+      device_class: temperature
+      unit_of_measurement: "°C"
+      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18B20'][?(@.ROMId =='E281FF550A646128')]"
+      json_attributes:
+        - Channel
+        - Health
+        - ROMId
+
+    - name: "ow_boiler_in_temp"
+      unique_id: owserver.ow_boiler_in_temp
+      value_template: "{{ (value_json['Devices-Detail-Response']['owd_DS18S20'] | selectattr('ROMId','==','340008022A1DEF10') | list | first)['Temperature']['#text'] | round(1) }}"
+      force_update: true
+      device_class: temperature
+      unit_of_measurement: "°C"
+      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18S20'][?(@.ROMId =='340008022A1DEF10')]"
+      json_attributes:
+        - Channel
+        - Health
+        - ROMId
+
+    - name: "ow_boiler_out_temp"
+      unique_id: owserver.ow_boiler_out_temp
+      value_template: "{{ (value_json['Devices-Detail-Response']['owd_DS18S20'] | selectattr('ROMId','==','6D0008022A1AA310') | list | first)['Temperature']['#text'] | round(1) }}"
+      force_update: true
+      device_class: temperature
+      unit_of_measurement: "°C"
+      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18S20'][?(@.ROMId =='6D0008022A1AA310')]"
+      json_attributes:
+        - Channel
+        - Health
+        - ROMId
+
+    - name: "ow_boiler_temp"
+      unique_id: owserver.ow_boiler_temp
+      value_template: "{{ (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','778A25710A646128') | list | first)['Temperature']['#text'] | round(1) }}"
+      force_update: true
+      device_class: temperature
+      unit_of_measurement: "°C"
+      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18B20'][?(@.ROMId =='778A25710A646128')]"
+      json_attributes:
+        - Channel
+        - Health
+        - ROMId
+
+    - name: "ow_outside_temp"
+      unique_id: owserver.ow_outside_temp
+      value_template: "{{ (value_json['Devices-Detail-Response']['owd_DS18S20'] | selectattr('ROMId','==','560008022A0D0E10') | list | first)['Temperature']['#text'] | round(1) }}"
+      force_update: true
+      device_class: temperature
+      unit_of_measurement: "°C"
+      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18S20'][?(@.ROMId =='560008022A0D0E10')]"
+      json_attributes:
+        - Channel
+        - Health
+        - ROMId
 
 sensor:
-  - platform: snmp
-    name: ow_boiler_temp
-    host: 192.168.10.31
-    baseoid: 1.3.6.1.4.1.31440.10.6.1.1.1
-    scan_interval: 30
+  # - platform: snmp
+  #   # ROM ID 310119143EF32B28
+  #   name: ow_boiler_temp
+  #   host: 192.168.10.31
+  #   baseoid: 1.3.6.1.4.1.31440.10.5.1.1.11
+  #   scan_interval: 30
 
-  - platform: snmp
-    name: ow_boiler_out_temp
-    host: 192.168.10.31
-    baseoid: 1.3.6.1.4.1.31440.10.6.1.1.3
-    scan_interval: 30
+  # - platform: snmp
+  #   # ROM ID 340008022A1DEF10
+  #   name: ow_boiler_out_temp
+  #   host: 192.168.10.31
+  #   baseoid: 1.3.6.1.4.1.31440.10.6.1.1.3
+  #   scan_interval: 30
 
-  - platform: snmp
-    name: ow_outside_temp
-    host: 192.168.10.31
-    baseoid: 1.3.6.1.4.1.31440.10.6.1.1.2
-    scan_interval: 30
+  # - platform: snmp
+  #   # ROM ID 6D0008022A1AA310
+  #   name: ow_boiler_in_temp
+  #   host: 192.168.10.31
+  #   baseoid: 1.3.6.1.4.1.31440.10.6.1.1.4
 
-  - platform: snmp
-    name: ow_pool_temp
-    host: 192.168.10.31
-    baseoid: 1.3.6.1.4.1.31440.10.5.1.1.10
-    scan_interval: 30
+  # - platform: snmp
+  #   #ROM ID 330008022A17A510
+  #   name: ow_underfloor_return_temp
+  #   host: 192.168.10.31
+  #   baseoid: 1.3.6.1.4.1.31440.10.6.1.1.8
+  #   scan_interval: 30
 
-  - platform: snmp
-    name: ow_pool_techroom_temp
-    host: 192.168.10.31
-    baseoid: 1.3.6.1.4.1.31440.10.5.1.1.11
-    scan_interval: 30
+  # - platform: snmp
+  #   # ROM ID 560008022A0D0E10
+  #   name: ow_outside_temp
+  #   host: 192.168.10.31
+  #   baseoid: 1.3.6.1.4.1.31440.10.6.1.1.2
+  #   scan_interval: 30
 
-  - platform: snmp
-    name: ow_kitchen_temp
-    host: 192.168.10.31
-    baseoid: 1.3.6.1.4.1.31440.10.6.1.1.6
-    scan_interval: 30
+  # - platform: snmp
+  #   # ROM ID DD0119142F965B28
+  #   name: ow_pool_temp
+  #   host: 192.168.10.31
+  #   baseoid: 1.3.6.1.4.1.31440.10.5.1.1.10
+  #   scan_interval: 30
 
-    # Temperaturmedel över dygnet
+  #  - platform: snmp
+  # ROM ID
+  # name: ow_pool_techroom_temp
+  # host: 192.168.10.31
+  # baseoid: 1.3.6.1.4.1.31440.10.5.1.1.11
+  # scan_interval: 30
+  # - platform: snmp
+  #   # ROM ID 0B0008027C035E10
+  #   name: ow_kitchen_temp
+  #   host: 192.168.10.31
+  #   baseoid: 1.3.6.1.4.1.31440.10.6.1.1.6
+  #   scan_interval: 30
+
+  # Temperaturmedel över dygnet
   - platform: statistics
     name: "Temperature Mean last day"
-    entity_id: sensor.ow_outside_temp_rounded
+    entity_id: sensor.ow_outside_temp
     state_characteristic: mean
     precision: 0
     sampling_size: 1500
@@ -65,7 +201,7 @@ sensor:
   # Temperaturmedel över veckan
   - platform: statistics
     name: "Temperature Mean last week"
-    entity_id: sensor.ow_outside_temp_rounded
+    entity_id: sensor.ow_outside_temp
     state_characteristic: mean
     precision: 0
     sampling_size: 1500
@@ -75,7 +211,7 @@ sensor:
   # Temperaturmedel över månaden
   - platform: statistics
     name: "Temperature Mean last month"
-    entity_id: sensor.ow_outside_temp_rounded
+    entity_id: sensor.ow_outside_temp
     state_characteristic: mean
     precision: 0
     sampling_size: 1500
@@ -91,33 +227,38 @@ template:
           {% endif %}
         unique_id: "41b1a348-4fc4-41be-ae14-5b1432fe2218"
 
-  - sensor:
-      - name: ow_outside_temp_rounded
-        unique_id: 283a3670-b909-46d8-bfa6-749e70a03866
-        unit_of_measurement: "°C"
-        state: "{{ (states('sensor.ow_outside_temp') | round(1)) }}"
+  # - sensor:
+  #     - name: ow_outside_temp_rounded
+  #       unique_id: 283a3670-b909-46d8-bfa6-749e70a03866
+  #       unit_of_measurement: "°C"
+  #       state: "{{ (states('sensor.ow_outside_temp') | round(1)) }}"
 
-      - name: ow_boiler_temp_rounded
-        unique_id: e878a1b4-375c-4b41-b967-2885adc612c9
-        unit_of_measurement: "°C"
-        state: "{{ (states('sensor.ow_boiler_temp') | round(1)) }}"
+  #     - name: ow_boiler_temp_rounded
+  #       unique_id: e878a1b4-375c-4b41-b967-2885adc612c9
+  #       unit_of_measurement: "°C"
+  #       state: "{{ (states('sensor.ow_boiler_temp') | round(1)) }}"
 
-      - name: ow_boiler_out_temp_rounded
-        unique_id: 44cec4b6-352e-4040-a792-aa051951ca4a
-        unit_of_measurement: "°C"
-        state: "{{ (states('sensor.ow_boiler_out_temp')|round(1)) }}"
+  #     - name: ow_boiler_out_temp_rounded
+  #       unique_id: 44cec4b6-352e-4040-a792-aa051951ca4a
+  #       unit_of_measurement: "°C"
+  #       state: "{{ (states('sensor.ow_boiler_out_temp')|round(1)) }}"
 
-      - name: ow_pool_temp_rounded
-        unique_id: 4cc0e228-30b5-4e8a-8ccc-c59dbc46058c
-        unit_of_measurement: "°C"
-        state: "{{ (states('sensor.ow_pool_temp')|round(1)) }}"
+  #     - name: ow_boiler_in_temp_rounded
+  #       unique_id: 1510373d-c04b-4f21-b52a-2069e1df6682
+  #       unit_of_measurement: "°C"
+  #       state: "{{ (states('sensor.ow_boiler_in_temp')|round(1)) }}"
 
-      - name: ow_pool_techroom_temp_rounded
-        unique_id: f12593c0-879d-4164-b86e-9579939a2923
-        unit_of_measurement: "°C"
-        state: "{{ (states('sensor.ow_pool_techroom_temp')|round(1)) }}"
+  #     - name: ow_pool_temp_rounded
+  #       unique_id: 4cc0e228-30b5-4e8a-8ccc-c59dbc46058c
+  #       unit_of_measurement: "°C"
+  #       state: "{{ (states('sensor.ow_pool_temp')|round(1)) }}"
 
-      - name: ow_kitchen_temp_rounded
-        unique_id: f08cbc34-e72a-4cb8-abd9-26778303bc99
-        unit_of_measurement: "°C"
-        state: "{{ (states('sensor.ow_kitchen_temp')|round(1)) }}"
+  #     - name: ow_pool_techroom_temp_rounded
+  #       unique_id: f12593c0-879d-4164-b86e-9579939a2923
+  #       unit_of_measurement: "°C"
+  #       state: "{{ (states('sensor.ow_pool_techroom_temp')|round(1)) }}"
+
+  #     - name: ow_kitchen_temp_rounded
+  #       unique_id: f08cbc34-e72a-4cb8-abd9-26778303bc99
+  #       unit_of_measurement: "°C"
+  #       state: "{{ (states('sensor.ow_kitchen_temp')|round(1)) }}"
