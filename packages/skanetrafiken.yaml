@@ -1,6 +1,6 @@
 sensor:
   - platform: resrobot
-    fetch_interval: 30
+    fetch_interval: 10
     key: !secret trafiklab
     departures:
       - stop_id: 740072471
