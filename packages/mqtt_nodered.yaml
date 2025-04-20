@@ -1,0 +1,6 @@
+mqtt:
+  sensor:
+    - name: "Node-RED Heartbeat"
+      state_topic: "node-red/heartbeat"
+      value_template: "{{ value_json.status }}"
+      json_attributes_topic: "node-red/heartbeat"
