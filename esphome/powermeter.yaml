@@ -1,4 +1,5 @@
 substitutions:
+  static_ip: 192.168.10.66
 # Change the disp_name to something you want  
   disp_name: Powermeter
 # Interval of how often the power is updated
@@ -19,15 +20,16 @@ substitutions:
 
 esphome:
   name: powermeter
-  comment: "https://circuitsetup.us"
-  platform: ESP32
+  comment: "https://circuitsetup.us ${static_ip}"
+
+esp32:
   board: nodemcu-32s
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
   manual_ip:
-    static_ip: 192.168.10.66
+    static_ip: $static_ip
     gateway: 192.168.10.1
     subnet: 255.255.255.0
 

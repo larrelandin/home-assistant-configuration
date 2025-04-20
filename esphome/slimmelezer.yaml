@@ -1,13 +1,15 @@
 substitutions:
   device_name: slimmelezer
   device_description: "DIY P1 module to read your smart meter"
+  static_ip: 192.168.10.70
+
+esp8266:
+  board: d1_mini
+  restore_from_flash: true
 
 esphome:
   name: ${device_name}
-  comment: "${device_description}"
-  platform: ESP8266
-  esp8266_restore_from_flash: true
-  board: d1_mini
+  comment: "${device_description} ${static_ip}"
   name_add_mac_suffix: false
   project:
     name: zuidwijk.slimmelezer
@@ -33,7 +35,7 @@ wifi:
   fast_connect: true
       
   manual_ip:
-    static_ip: 192.168.10.70
+    static_ip: $static_ip
     gateway: 192.168.10.1
     subnet: 255.255.255.0
 

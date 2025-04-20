@@ -1,5 +1,9 @@
+substitutions:
+  static_ip: 192.168.10.62
+
 esphome:
   name: garage-door-esp
+  comment: $static_ip
   on_boot: 
     then:
       - lock.lock: lock_garage
@@ -26,7 +30,7 @@ wifi:
   fast_connect: true
 
   manual_ip:
-    static_ip: 192.168.10.62
+    static_ip: $static_ip
     gateway: 192.168.10.1
     subnet: 255.255.255.0
 
@@ -34,10 +38,16 @@ text_sensor:
   - platform: version
     name: "ESPHome Version"
 
+status_led:
+  pin: 
+    number: GPIO02
+    inverted: true
+
 output:
   - platform: gpio
-    pin: GPIO0
+    pin: GPIO0 #D3
     id: relay
+
 lock:
   - platform: output
     id: lock_garage
@@ -50,8 +60,7 @@ binary_sensor:
     name: "Garagedörr"
     device_class: door
     pin:
-      # Connected to GPIO on the ESP-01S.
-      number: GPIO2
+      number: GPIO14 #D5
       mode: INPUT_PULLUP
       inverted: false
     filters:
@@ -60,8 +69,3 @@ binary_sensor:
       - delayed_off: 25ms
   - platform: status
     name: "Garagedörr ESP status"
-
-#status_led:
-#  pin: 
-#    number: GPIO2
-#    inverted: true

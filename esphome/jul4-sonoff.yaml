@@ -1,5 +1,12 @@
+substitutions:
+  static_ip: 192.168.10.64
+  name: "Jul4"
+  safename: "jul4"
+  encryption_key: "kSnWIMQbW+uJbj6AyuyDnn/EStv8f84GwFCM41uj2tk="
+
 esphome:
-  name: jul4-sonoff
+  name: "${safename}-sonoff"
+  comment: $static_ip
   platform: ESP8266
   board: esp01_1m
 
@@ -10,7 +17,7 @@ wifi:
   fast_connect: true
   
   manual_ip:
-    static_ip: 192.168.10.64
+    static_ip: $static_ip
     gateway: 192.168.10.1
     subnet: 255.255.255.0
 
@@ -20,7 +27,7 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: "kSnWIMQbW+uJbj6AyuyDnn/EStv8f84GwFCM41uj2tk="
+    key: $encryption_key
 
 ota:
   - platform: esphome
@@ -32,8 +39,8 @@ binary_sensor:
       number: GPIO0
       mode: INPUT_PULLUP
       inverted: True
-    name: "Jul4 knapp"
-    id: jul4_button
+    name: "${name} knapp"
+    id: "${safename}_button"
     on_press:
       then:
         if:
@@ -46,8 +53,8 @@ binary_sensor:
           else:
             - light.turn_off: light1
   - platform: status
-    name: "Jul4 Sonoff status"
-    id: jul4_sonoff_status
+    name: "${name} Sonoff status"
+    id: "${safename}_sonoff_status"
 
 output:
   - platform: gpio
@@ -56,6 +63,6 @@ output:
 
 light:
   - platform: binary
-    name: "Jul4"
+    name: $name
     id: light1
     output: relay1
