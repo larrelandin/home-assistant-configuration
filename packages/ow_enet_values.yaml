@@ -1,8 +1,51 @@
+automation:
+  - alias: "Logga sensor health fel"
+    trigger:
+      - platform: state
+        entity_id:
+          - sensor.ow_kitchen_health
+          - sensor.ow_pool_health
+          - sensor.ow_pool_techroom_health
+          - sensor.ow_underfloor_return_health
+          - sensor.ow_underfloor_out_health
+          - sensor.ow_boiler_in_health
+          - sensor.ow_boiler_out_health
+          - sensor.ow_boiler_health
+          - sensor.ow_outside_health
+        to: "0"
+    action:
+      - service: persistent_notification.create
+        data:
+          title: "1-Wire Sensor Fel"
+          message: "En eller flera 1-wire sensorer rapporterar Health = 0"
+          notification_id: ow_sensor_health_warning
+      - service: system_log.write
+        data:
+          message: "En eller flera 1-wire sensorer rapporterar Health = 0"
+          level: warning
+
+template:
+  - sensor:
+      - name: "ow_pool_temp_rounded"
+        unique_id: ow_pool_temp_rounded
+        device_class: temperature
+        unit_of_measurement: "°C"
+        state: "{{ states('sensor.ow_pool_temp_smoothed') | float | round(0) }}"
+
+sensor:
+  - platform: filter
+    name: "ow_pool_temp_smoothed"
+    entity_id: sensor.ow_pool_temp
+    filters:
+      - filter: lowpass
+        time_constant: 10
+        precision: 1
+
 rest:
   resource: "http://192.168.10.31/details.xml"
   scan_interval: 60
   sensor:
-
+    # 1-wire huvudnod
     - name: "1 wire EDS"
       unique_id: "owserver"
       value_template: "{{ value_json['Devices-Detail-Response']['HostName'] }}"
@@ -25,147 +68,211 @@ rest:
         - DataErrorsChannel1
         - DataErrorsChannel2
         - DataErrorsChannel3
+        - owd_DS18S20
+        - owd_DS18B20
 
     - name: "ow_kitchen_temp"
       unique_id: owserver.ow_kitchen_temp
       value_template: >
         {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18S20'] | selectattr('ROMId','==','0B0008027C035E10') | list | first) %}
-        {% if sensor['Health'] | float >= 7 %}
+        {% if sensor['Health'] | int >= 7 %}
           {{ sensor['Temperature']['#text'] | round(1) }}
         {% else %} unavailable {% endif %}
-      force_update: true
       device_class: temperature
       unit_of_measurement: "°C"
-      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18S20'][?(@.ROMId =='0B0008027C035E10')]"
+      force_update: true
       json_attributes:
-        - Channel
-        - Health
         - ROMId
+        - Channel
 
+    - name: "ow_kitchen_health"
+      unique_id: owserver.ow_kitchen_health
+      value_template: >
+        {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18S20'] | selectattr('ROMId','==','0B0008027C035E10') | list | first) %}
+        {{ sensor['Health'] | int if sensor is defined else 0 }}
+      force_update: true
+      icon: mdi:heart-pulse
+
+    # ow_pool_temp + health
     - name: "ow_pool_temp"
       unique_id: owserver.ow_pool_temp
       value_template: >
         {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','DD0119142F965B28') | list | first) %}
-        {% if sensor['Health'] | float >= 7 %}
+        {% if sensor['Health'] | int >= 7 %}
           {{ sensor['Temperature']['#text'] | round(1) }}
         {% else %} unavailable {% endif %}
-      force_update: true
       device_class: temperature
       unit_of_measurement: "°C"
-      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18B20'][?(@.ROMId =='DD0119142F965B28')]"
+      force_update: true
       json_attributes:
-        - Channel
-        - Health
         - ROMId
+        - Channel
 
+    - name: "ow_pool_health"
+      unique_id: owserver.ow_pool_health
+      value_template: >
+        {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','DD0119142F965B28') | list | first) %}
+        {{ sensor['Health'] | int if sensor is defined else 0 }}
+      force_update: true
+      icon: mdi:heart-pulse
+
+    # ow_pool_techroom_temp + health
     - name: "ow_pool_techroom_temp"
       unique_id: owserver.ow_pool_techroom_temp
       value_template: >
         {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','F10119143F90B328') | list | first) %}
-        {% if sensor['Health'] | float >= 7 %}
+        {% if sensor['Health'] | int >= 7 %}
           {{ sensor['Temperature']['#text'] | round(1) }}
         {% else %} unavailable {% endif %}
-      force_update: true
       device_class: temperature
       unit_of_measurement: "°C"
-      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18B20'][?(@.ROMId =='F10119143F90B328')]"
+      force_update: true
       json_attributes:
-        - Channel
-        - Health
         - ROMId
+        - Channel
 
+    - name: "ow_pool_techroom_health"
+      unique_id: owserver.ow_pool_techroom_health
+      value_template: >
+        {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','F10119143F90B328') | list | first) %}
+        {{ sensor['Health'] | int if sensor is defined else 0 }}
+      force_update: true
+      icon: mdi:heart-pulse
+
+    # ow_underfloor_return_temp + health
     - name: "ow_underfloor_return_temp"
       unique_id: owserver.ow_underfloor_return_temp
       value_template: >
         {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','19544D550A646128') | list | first) %}
-        {% if sensor['Health'] | float >= 7 %}
+        {% if sensor['Health'] | int >= 7 %}
           {{ sensor['Temperature']['#text'] | round(1) }}
         {% else %} unavailable {% endif %}
-      force_update: true
       device_class: temperature
       unit_of_measurement: "°C"
-      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18B20'][?(@.ROMId =='19544D550A646128')]"
+      force_update: true
       json_attributes:
-        - Channel
-        - Health
         - ROMId
+        - Channel
 
+    - name: "ow_underfloor_return_health"
+      unique_id: owserver.ow_underfloor_return_health
+      value_template: >
+        {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','19544D550A646128') | list | first) %}
+        {{ sensor['Health'] | int if sensor is defined else 0 }}
+      force_update: true
+      icon: mdi:heart-pulse
+
+    # ow_underfloor_out_temp + health
     - name: "ow_underfloor_out_temp"
       unique_id: owserver.ow_underfloor_out_temp
       value_template: >
         {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','E281FF550A646128') | list | first) %}
-        {% if sensor['Health'] | float >= 7 %}
+        {% if sensor['Health'] | int >= 7 %}
           {{ sensor['Temperature']['#text'] | round(1) }}
         {% else %} unavailable {% endif %}
-      force_update: true
       device_class: temperature
       unit_of_measurement: "°C"
-      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18B20'][?(@.ROMId =='E281FF550A646128')]"
+      force_update: true
       json_attributes:
-        - Channel
-        - Health
         - ROMId
+        - Channel
 
+    - name: "ow_underfloor_out_health"
+      unique_id: owserver.ow_underfloor_out_health
+      value_template: >
+        {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','E281FF550A646128') | list | first) %}
+        {{ sensor['Health'] | int if sensor is defined else 0 }}
+      force_update: true
+      icon: mdi:heart-pulse
+
+    # ow_boiler_in_temp + health
     - name: "ow_boiler_in_temp"
       unique_id: owserver.ow_boiler_in_temp
       value_template: >
         {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18S20'] | selectattr('ROMId','==','340008022A1DEF10') | list | first) %}
-        {% if sensor['Health'] | float >= 7 %}
+        {% if sensor['Health'] | int >= 7 %}
           {{ sensor['Temperature']['#text'] | round(1) }}
         {% else %} unavailable {% endif %}
-      force_update: true
       device_class: temperature
       unit_of_measurement: "°C"
-      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18S20'][?(@.ROMId =='340008022A1DEF10')]"
+      force_update: true
       json_attributes:
-        - Channel
-        - Health
         - ROMId
+        - Channel
 
+    - name: "ow_boiler_in_health"
+      unique_id: owserver.ow_boiler_in_health
+      value_template: >
+        {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18S20'] | selectattr('ROMId','==','340008022A1DEF10') | list | first) %}
+        {{ sensor['Health'] | int if sensor is defined else 0 }}
+      force_update: true
+      icon: mdi:heart-pulse
+
+    # ow_boiler_out_temp + health
     - name: "ow_boiler_out_temp"
       unique_id: owserver.ow_boiler_out_temp
       value_template: >
         {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18S20'] | selectattr('ROMId','==','6D0008022A1AA310') | list | first) %}
-        {% if sensor['Health'] | float >= 7 %}
+        {% if sensor['Health'] | int >= 7 %}
           {{ sensor['Temperature']['#text'] | round(1) }}
         {% else %} unavailable {% endif %}
-      force_update: true
       device_class: temperature
       unit_of_measurement: "°C"
-      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18S20'][?(@.ROMId =='6D0008022A1AA310')]"
+      force_update: true
       json_attributes:
-        - Channel
-        - Health
         - ROMId
+        - Channel
 
+    - name: "ow_boiler_out_health"
+      unique_id: owserver.ow_boiler_out_health
+      value_template: >
+        {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18S20'] | selectattr('ROMId','==','6D0008022A1AA310') | list | first) %}
+        {{ sensor['Health'] | int if sensor is defined else 0 }}
+      force_update: true
+      icon: mdi:heart-pulse
+
+    # ow_boiler_temp + health
     - name: "ow_boiler_temp"
       unique_id: owserver.ow_boiler_temp
       value_template: >
         {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','778A25710A646128') | list | first) %}
-        {% if sensor['Health'] | float >= 7 %}
+        {% if sensor['Health'] | int >= 7 %}
           {{ sensor['Temperature']['#text'] | round(1) }}
         {% else %} unavailable {% endif %}
-      force_update: true
       device_class: temperature
       unit_of_measurement: "°C"
-      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18B20'][?(@.ROMId =='778A25710A646128')]"
+      force_update: true
       json_attributes:
-        - Channel
-        - Health
         - ROMId
+        - Channel
 
+    - name: "ow_boiler_health"
+      unique_id: owserver.ow_boiler_health
+      value_template: >
+        {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','778A25710A646128') | list | first) %}
+        {{ sensor['Health'] | int if sensor is defined else 0 }}
+      force_update: true
+      icon: mdi:heart-pulse
+
+    # ow_outside_temp + health
     - name: "ow_outside_temp"
       unique_id: owserver.ow_outside_temp
       value_template: >
-        {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18S20'] | selectattr('ROMId','==','560008022A0D0E10') | list | first) %}
-        {% if sensor['Health'] | float >= 7 %}
+        {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','C0F063710A646128') | list | first) %}
+        {% if sensor['Health'] | int >= 7 %}
           {{ sensor['Temperature']['#text'] | round(1) }}
         {% else %} unavailable {% endif %}
-      force_update: true
       device_class: temperature
       unit_of_measurement: "°C"
-      json_attributes_path: "$.['Devices-Detail-Response']['owd_DS18S20'][?(@.ROMId =='560008022A0D0E10')]"
+      force_update: true
       json_attributes:
-        - Channel
-        - Health
         - ROMId
+        - Channel
+
+    - name: "ow_outside_health"
+      unique_id: owserver.ow_outside_health
+      value_template: >
+        {% set sensor = (value_json['Devices-Detail-Response']['owd_DS18B20'] | selectattr('ROMId','==','C0F063710A646128') | list | first) %}
+        {{ sensor['Health'] | int if sensor is defined else 0 }}
+      force_update: true
+      icon: mdi:heart-pulse
