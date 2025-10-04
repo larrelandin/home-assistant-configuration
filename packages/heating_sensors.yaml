@@ -11,38 +11,41 @@ template:
         unit_of_measurement: "°C"
   - binary_sensor:
       - name: "Heating system needed"
+        unique_id: heating_system_needed
         state: >
-          {% if  states('sensor.temperature_mean_last_month') !=  'unavailable' %}
-          {{ states('sensor.temperature_mean_last_month')|int < 17 }}
-          {% endif %}
+          {{ (states('sensor.temperature_mean_last_month') | float(999)) < 17 }}
+  - sensor:
+      - name: "Panntemperatur för trendberäkning"
+        state: >
+          {{ states('sensor.ow_boiler_temp') | float }}
 
 #sensor:
-  # Utjämnad pelletskurva
-  # - platform: filter
-  #   name: "Filtered Pellet Level"
-  #   entity_id: sensor.pellet_level
-  #   filters:
-  #     - filter: time_simple_moving_average
-  #       window_size: 20
-  #     - filter: lowpass
-  #       time_constant: 20
-  #       precision: 0
+# Utjämnad pelletskurva
+# - platform: filter
+#   name: "Filtered Pellet Level"
+#   entity_id: sensor.pellet_level
+#   filters:
+#     - filter: time_simple_moving_average
+#       window_size: 20
+#     - filter: lowpass
+#       time_constant: 20
+#       precision: 0
 
 # Trend panntemperatur
 binary_sensor:
   - platform: trend
     sensors:
       furnace_heating_falling:
-        entity_id: sensor.ow_boiler_temp
+        entity_id: sensor.panntemperatur_for_trendberakning
         friendly_name: "Panntemperatur sjunkande"
-        sample_duration: 300
+        sample_duration: 50
         min_gradient: -0.0008
         device_class: cold
 
       furnace_heating_rising:
-        entity_id: sensor.ow_boiler_temp
+        entity_id: sensor.panntemperatur_for_trendberakning
         friendly_name: "Panntemperatur stigande"
-        sample_duration: 300
+        sample_duration: 50
         min_gradient: 0.0008
         device_class: heat
 

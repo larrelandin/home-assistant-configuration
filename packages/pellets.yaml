@@ -1,6 +1,7 @@
 sensor:
   - platform: daily_min_max
     name: Pellets Kg Daily Min
+    unique_id: pellets_kg_daily_min
     type: min
     manual_reset_only: true
     entity_ids:
@@ -17,20 +18,37 @@ template:
         unit_of_measurement: "Öre/kWh"
         unique_id: 537d3154-1d86-44fe-9e52-fe62304a0a11
         state: >
-          {{ (((states('input_number.pelletssackar_pris') | float / 16) / 0.91 ) / 4.8 * 100 ) | round(2) }}
+          {% set pris_per_sack = states('input_number.pelletssackar_pris') | float(0) %}
+          {% set kg_per_sack = 16 %}
+          {% set verkningsgrad = 0.91 %}
+          {% set kwh_per_kg = 4.8 %}
+          {% set ore = ((pris_per_sack / kg_per_sack) / verkningsgrad) / kwh_per_kg * 100 %}
+          {{ ore | round(2) }}
         # Pannans verkningsgrad 91%, Pellets 4,8 kWh/kg, 16kg pellets per säck
   - sensor:
       - name: "Pelletspris kronor"
         unit_of_measurement: "Kr/kWh"
         unique_id: 0a8f94ea-a723-45ea-b881-b6f3c2677ad4
         state: >
-          {{ states('sensor.pelletspris') | float / 100 }}
+          {{ states('sensor.pelletspris') | float(0) / 100 }}
   - sensor:
       - name: "Beräkning slut på pellets"
         unit_of_measurement: "dagar"
         unique_id: a2ab8cc7-502f-4383-b286-30d1cc0925f1
         state: >
-          {{ ((states.counter.pelletssackar_lager.state | int(0) + states.sensor.pelletsackar_i_veckoforrad.state | float(0)) * 16 / max((states.sensor.daily_pellets.attributes.last_period | float(0)),(states.sensor.daily_pellets.state | float(0)),(states.sensor.weekly_pellets.state | float(0) / 7),(states.sensor.weekly_pellets.attributes.last_period | float(0) / 7))) | round(0) }}
+          {% set sacks = (states('counter.pelletssackar_lager') | int(0))
+                        + (states('sensor.pelletsackar_i_veckoforrad') | float(0)) %}
+          {% set kg_per_sack = 16 %}
+          {% set daily       = states('sensor.daily_pellets') | float(0) %}
+          {% set daily_last  = state_attr('sensor.daily_pellets','last_period') | float(0) %}
+          {% set weekly      = (states('sensor.weekly_pellets') | float(0)) / 7 %}
+          {% set weekly_last = (state_attr('sensor.weekly_pellets','last_period') | float(0)) / 7 %}
+          {% set usage = [daily, daily_last, weekly, weekly_last] | max %}
+          {% if usage > 0 %}
+            {{ (sacks * kg_per_sack / usage) | round(0) }}
+          {% else %}
+            {{ '' }}  {# unknown instead of division by zero #}
+          {% endif %}
   - sensor:
       - name: "Panna konsumtion pellets"
         unit_of_measurement: kWh
@@ -38,7 +56,7 @@ template:
         state_class: total_increasing
         device_class: energy
         state: >
-          {{ states('sensor.yearly_pellets') | float * 4.8 }}
+          {{ states('sensor.yearly_pellets') | float(0) * 4.8 }}
 
 utility_meter:
   daily_pellets:
