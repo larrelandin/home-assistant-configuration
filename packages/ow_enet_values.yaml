@@ -38,7 +38,10 @@ sensor:
     entity_id: sensor.ow_pool_temp
     filters:
       - filter: lowpass
-        time_constant: 10
+        time_constant: 30
+        precision: 1
+      - filter: time_simple_moving_average
+        window_size: "00:10"
         precision: 1
 
 rest:
