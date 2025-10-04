@@ -4,10 +4,17 @@ substitutions:
 esphome:
   name: garage-door-esp
   comment: $static_ip
-  on_boot: 
+  on_boot:
+    priority: 200   # run after most hardware is up; not super critical
     then:
-      - lock.lock: lock_garage
-
+      - delay: 500ms    # small debounce for power-up quirks
+      - if:
+          condition:
+            lambda: 'return id(garage_should_be_locked);'
+          then:
+            - lock.lock: lock_garage
+          else:
+            - lock.unlock: lock_garage
 esp8266:
   board: esp01_1m
 
@@ -38,6 +45,12 @@ text_sensor:
   - platform: version
     name: "ESPHome Version"
 
+globals:
+  - id: garage_should_be_locked
+    type: bool
+    restore_value: true
+    initial_value: "true"
+
 status_led:
   pin: 
     number: GPIO02
@@ -53,6 +66,14 @@ lock:
     id: lock_garage
     name: "Garagedörr"
     output: relay
+    on_lock:
+      then:
+        - lambda: |-
+            id(garage_should_be_locked) = true;
+    on_unlock:
+      then:
+        - lambda: |-
+            id(garage_should_be_locked) = false;
 
 binary_sensor:
   - platform: gpio
