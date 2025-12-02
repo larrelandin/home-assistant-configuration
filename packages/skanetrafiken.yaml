@@ -4,7 +4,7 @@ sensor:
     key: !secret trafiklab
     departures:
       - stop_id: 740072471
-        name: "Buss till Botulfsplatsen"
+        name: "Buss till Stortorget"
         max_journeys: 20
         sensors: 3
         unit: "🕑"
@@ -21,8 +21,8 @@ sensor:
         time_format: "%H:%M"
         filter:
           - direction: "Lund C"
-      - stop_id: 740016981
-        name: "Bussar från Botulfsplatsen"
+      - stop_id: 740077054
+        name: "Bussar från Stortorget"
         max_journeys: 20
         sensors: 3
         unit: "🕑"
