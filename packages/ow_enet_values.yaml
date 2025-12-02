@@ -44,6 +44,20 @@ sensor:
         window_size: "00:10"
         precision: 1
 
+  - platform: daily_min_max
+    name: Dygnets lägsta utetemperatur
+    unique_id: 34956152-c233-47f7-98a4-42134647e7fe
+    type: min
+    entity_ids:
+      - sensor.ow_outside_temp
+  - platform: daily_min_max
+    name: Dygnets högsta utetemperatur
+    unique_id: 1a464096-fd9b-495f-8ac9-55c8d481504a
+    type: max
+    time: "03:30:00"
+    entity_ids:
+      - sensor.ow_outside_temp
+
 rest:
   resource: "http://192.168.10.31/details.xml"
   scan_interval: 60
