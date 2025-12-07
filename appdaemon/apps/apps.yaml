@@ -1,0 +1,39 @@
+pellet_level:
+  module: pellet_level
+  class: PelletLevel
+
+  camera_entity: camera.pellet_snapshot
+
+  # HA Core writes here (must be /config/... and allowlisted)
+  ha_snapshot_path: /config/www/snapshots/pellet_raw.jpg
+
+  # AppDaemon reads/writes here (inside AppDaemon add-on)
+  raw_path: /homeassistant/www/snapshots/pellet_raw.jpg
+  # Optional: save mask for visual verification (comment out to disable)
+  mask_output_path: /homeassistant/www/snapshots/pellet_mask.png
+
+  # Your tuned ROI
+  rotate_deg: -35
+  crop_left_px: 770
+  crop_top_px: 490
+  crop_width_px: 50
+  crop_height_px: 300
+
+  # Thresholding (omit to let Otsu pick automatically)
+  # threshold: 165
+  median_radius: 1
+
+  # Main sensor
+  sensor_entity: sensor.pellet_level
+
+  # Calibration: raw fraction (0..1) -> sacks (0..12)
+  filter:
+    - calibrate_linear:
+        - 0.02  -> 0
+        - 0.428 -> 0.5
+        - 0.52 -> 1
+        - 0.88  -> 12
+
+  interval_seconds: 300
+  process_delay_sec: 5
+  process_wait_sec: 10

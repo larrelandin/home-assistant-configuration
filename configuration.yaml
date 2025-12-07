@@ -12,6 +12,8 @@ homeassistant:
         192.168.10.40: 2bdf5d1522524220aab7e2d3359f9adf #CCD
         192.168.10.136: d533fc5016334f9ea95e79d94dbbc3d5 #Larre
       allow_bypass_login: true
+  allowlist_external_dirs:
+    - /config/www/snapshots
 
 http:
   use_x_forwarded_for: true
@@ -26,11 +28,6 @@ default_config:
 recorder:
   db_url: !secret connectionstring_mariadb
   purge_keep_days: 30
-  exclude:
-    entities:
-      - sensor.helper_bussar_fran_gastelyckan_o
-      - sensor.helper_buss_till_botulfsplatsen
-      - sensor.helper_bussar_fran_botulfsplatsen
 
 swedish_calendar:
 
@@ -41,10 +38,13 @@ shopping_list:
 
 logger:
   default: info
+  logs:
+    custom_components.daily_min_max: debug
+    custom_components.daily_min_max.sensor: debug
 
 frontend:
   extra_module_url:
-    - /hacsfiles/lovelace-card-mod/card-mod.js
+    - /hacsfiles/lovelace-card-mod/card-mod.js?hacstag=12345678901
 
 group: !include groups.yaml
 automation: !include automations.yaml
