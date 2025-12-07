@@ -8,6 +8,7 @@
 !*.md
 !esphome
 !packages
+!appdaemon
 
 # Ignore folders.
 .storage
