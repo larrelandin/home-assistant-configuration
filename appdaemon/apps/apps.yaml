@@ -11,6 +11,8 @@ pellet_level:
   raw_path: /homeassistant/www/snapshots/pellet_raw.jpg
   # Optional: save mask for visual verification (comment out to disable)
   mask_output_path: /homeassistant/www/snapshots/pellet_mask.png
+  debug_snapshot_path: /homeassistant/www/snapshots/pellet_debug.jpg
+  debug_line_thickness: 2
 
   # Your tuned ROI
   rotate_deg: -35
