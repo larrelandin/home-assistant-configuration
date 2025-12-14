@@ -25,10 +25,9 @@ pellet_level:
   # threshold: 165
   median_radius: 1
 
-  
   # Level-line detection
-  min_run_px: 25                # contiguous white pixels needed in a row
-  min_run_rows: 3               # must hold for this many consecutive rows
+  min_run_px: 25 # contiguous white pixels needed in a row
+  min_run_rows: 3 # must hold for this many consecutive rows
 
   # Main sensor
   sensor_entity: sensor.pellet_level
@@ -39,6 +38,8 @@ pellet_level:
         - 0.02  -> 0
         - 0.428 -> 0.5
         - 0.52 -> 1
+        - 0.737 -> 6.8
+        - 0.82 -> 7.6
         - 0.91  -> 12
 
   interval_seconds: 300

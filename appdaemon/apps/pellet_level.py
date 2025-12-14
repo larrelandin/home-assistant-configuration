@@ -72,8 +72,8 @@ class PelletLevel(hass.Hass):
     def _tick(self, *_):
         try:
             self.call_service("camera/snapshot",
-                              entity_id=self.camera_entity,
-                              filename=self.ha_snapshot_path)
+                entity_id=self.camera_entity,
+                filename=self.ha_snapshot_path)
             self.run_in(self._process_once, self.process_delay)
         except Exception as e:
             self.log(f"tick error: {e}", level="ERROR")
@@ -149,12 +149,12 @@ class PelletLevel(hass.Hass):
             else:
                 fill_frac = 1.0 - (y_level / float(h))
             fill_frac = max(0.0, min(1.0, fill_frac))
-            fill_pct = round(fill_frac * 100.0, 1)
 
             # Map to sacks
             sacks = self._interp_piecewise(self.cal_points, fill_frac)
             sacks = max(0.0, min(12.0, sacks))
             sacks = round(sacks, 1)
+            fill_pct = round((sacks / 12.0) * 100.0, 0)
 
             # ---- Draw red line on the DEBUG snapshot (if enabled and a level was found) ----
             if debug_img is not None:
@@ -186,7 +186,7 @@ class PelletLevel(hass.Hass):
                     "unit_of_measurement": "sacks",
                     "friendly_name": "Pellet Level (Sacks)",
                     "PercentageOfWhitePixels": raw_white_pct,
-                    "FillLevelPercentage": fill_pct,
+                    "SacksPercentage": fill_pct,
                     "threshold_used": thr,
                     "width": w,
                     "height": h,
@@ -196,7 +196,7 @@ class PelletLevel(hass.Hass):
                 },
             )
 
-            self.log(f"Sacks={sacks} | fill%={fill_pct} | raw%={raw_white_pct} | thr={thr} | y={y_level}")
+            self.log(f"Sacks={sacks} | Sacks%={fill_pct} | raw%={raw_white_pct} | thr={thr} | y={y_level}")
         except Exception as e:
             self.log(f"process error: {e}", level="ERROR")
 
@@ -249,7 +249,7 @@ class PelletLevel(hass.Hass):
         pts = sorted({(round(x, 6), round(y, 6)) for x, y in pts}, key=lambda t: t[0])
         return pts if len(pts) >= 2 else []
 
-    def _interp_piecewise(self, pts: List[Tuple[float, float]], x: float) -> float:
+    def _interp_piecewise(self, pts, x):
         if x <= pts[0][0]:
             return pts[0][1]
         if x >= pts[-1][0]:
@@ -261,8 +261,9 @@ class PelletLevel(hass.Hass):
                 if x1 == x0:
                     return (y0 + y1) / 2.0
                 t = (x - x0) / (x1 - x0)
-                return y0 + t * (y1 - y1 + 0)  # y0 + t*(y1-y0)
+                return y0 + t * (y1 - y0)   # <-- correct
         return pts[-1][1]
+
 
     def _opt_int(self, v):
         try:
