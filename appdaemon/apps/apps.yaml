@@ -15,18 +15,27 @@ pellet_level:
   debug_line_thickness: 2
 
   # Your tuned ROI
-  rotate_deg: -35
-  crop_left_px: 770
-  crop_top_px: 490
-  crop_width_px: 50
-  crop_height_px: 300
+  rotate_deg: 0
+  crop_left_px: 570 #650
+  crop_top_px: 200 # 530
+  crop_width_px: 50 # 50
+  crop_height_px: 370 # 300
+
+  # Turn off the auto steps
+  threshold_mode: fixed
+  threshold: 170          # pick your constant split (0–255)
+
+  # Lock the grayscale mapping: anything at/below this becomes 0, at/above becomes 255
+  fixed_black_level: 40   # input gray you consider “black”
+  fixed_white_level: 200  # input gray you consider “white”
+  gamma: 1.0              # optional gamma after mapping (e.g., 0.9–1.2)
 
   # Thresholding (omit to let Otsu pick automatically)
   # threshold: 165
   median_radius: 1
 
   # Level-line detection
-  min_run_px: 25 # contiguous white pixels needed in a row
+  min_run_px: 15 # contiguous white pixels needed in a row
   min_run_rows: 3 # must hold for this many consecutive rows
 
   # Main sensor
@@ -35,13 +44,14 @@ pellet_level:
   # Calibration: raw fraction (0..1) -> sacks (0..12)
   filter:
     - calibrate_linear:
-        - 0.02  -> 0
-        - 0.428 -> 0.5
-        - 0.52 -> 1
-        - 0.737 -> 6.8
-        - 0.82 -> 7.6
-        - 0.91  -> 12
+        - 0.027  -> 0 #M
+        - 0.44 -> 1
+        - 0497 -> 2 #M
+        - 0.51 -> 2.5 #M
+        - 0.585 -> 3.5
+        - 0.891 -> 9.5
+        - 0.915 -> 12 #M
 
-  interval_seconds: 300
+  interval_seconds: 30 #300
   process_delay_sec: 5
   process_wait_sec: 10
