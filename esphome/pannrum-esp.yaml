@@ -13,6 +13,7 @@ wifi:
   password: !secret landin_iot_wifi_password
   domain: '.landin.lan'
   fast_connect: true
+  min_auth_mode: WPA2
   
   manual_ip:
     static_ip: $static_ip
@@ -45,21 +46,21 @@ binary_sensor:
   - platform: status
     name: "Pannrum ESP status"
 
-    # Critical warning
-  - platform: template
-    name: Pellets Level Critical Warning
-    icon: mdi:alert-octagram-outline
-    id: pellets_warning_critical
-    lambda: |-
-      return id(pellet_distance).state >= 0.895;
+  #   # Critical warning
+  # - platform: template
+  #   name: Pellets Level Critical Warning
+  #   icon: mdi:alert-octagram-outline
+  #   id: pellets_warning_critical
+  #   lambda: |-
+  #     return id(pellet_distance).state >= 0.895;
       
-    # Warning
-  - platform: template
-    name: Pellets Level Warning
-    icon: mdi:alert-octagon-outline
-    id: pellets_warning
-    lambda: |-
-      return id(pellet_distance).state >= 0.7;
+  #   # Warning
+  # - platform: template
+  #   name: Pellets Level Warning
+  #   icon: mdi:alert-octagon-outline
+  #   id: pellets_warning
+  #   lambda: |-
+  #     return id(pellet_distance).state >= 0.7;
 
 sensor:
   - platform: tof10120

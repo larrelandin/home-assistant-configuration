@@ -13,6 +13,7 @@ wifi:
   password: !secret landin_iot_wifi_password
   domain: '.landin.lan'
   fast_connect: true
+  min_auth_mode: WPA2
   
   manual_ip:
     static_ip: $static_ip

@@ -34,6 +34,7 @@ wifi:
     static_ip: $static_ip
     gateway: 192.168.10.1
     subnet: 255.255.255.0
+  min_auth_mode: WPA2
 
 # mqtt:
 #  broker: !secret mqtt_broker
