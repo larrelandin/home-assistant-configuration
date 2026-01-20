@@ -57,6 +57,18 @@ template:
         device_class: energy
         state: >
           {{ states('sensor.yearly_pellets') | float(0) * 4.8 }}
+  - binary_sensor:
+      - name: pellets_level_warning
+        unique_id: ec395771-efc0-4346-8cc1-7731a9269985
+        state: >
+          {{ states('sensor.pellet_level') | float(0) < 4 }}
+        device_class: problem
+  - binary_sensor:
+      - name: pellets_level_critical_warning
+        unique_id: 40b9ecd5-ad2f-4790-8862-4228f59e69d9
+        state: >
+          {{ states('sensor.pellet_level') | float(0) < 2 }}
+        device_class: problem
 
 utility_meter:
   daily_pellets:

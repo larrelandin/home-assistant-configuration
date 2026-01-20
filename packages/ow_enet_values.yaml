@@ -1,29 +1,3 @@
-automation:
-  - alias: "Logga sensor health fel"
-    trigger:
-      - platform: state
-        entity_id:
-          - sensor.ow_kitchen_health
-          - sensor.ow_pool_health
-          - sensor.ow_pool_techroom_health
-          - sensor.ow_underfloor_return_health
-          - sensor.ow_underfloor_out_health
-          - sensor.ow_boiler_in_health
-          - sensor.ow_boiler_out_health
-          - sensor.ow_boiler_health
-          - sensor.ow_outside_health
-        to: "0"
-    action:
-      - service: persistent_notification.create
-        data:
-          title: "1-Wire Sensor Fel"
-          message: "En eller flera 1-wire sensorer rapporterar Health = 0"
-          notification_id: ow_sensor_health_warning
-      - service: system_log.write
-        data:
-          message: "En eller flera 1-wire sensorer rapporterar Health = 0"
-          level: warning
-
 template:
   - sensor:
       - name: "ow_pool_temp_rounded"
@@ -57,6 +31,13 @@ sensor:
     time: "03:30:00"
     entity_ids:
       - sensor.ow_outside_temp
+  - platform: statistics
+    name: temperature_mean_last_month
+    unique_id: 25915f3a-58d5-4bd3-bca6-bb1bc2268dd9
+    entity_id: sensor.ow_outside_temp
+    state_characteristic: mean
+    max_age:
+      days: 30
 
 rest:
   resource: "http://192.168.10.31/details.xml"
