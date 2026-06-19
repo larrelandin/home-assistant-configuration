@@ -36,8 +36,15 @@ api:
     key: $encryption_key
 
 ota:
+  - platform: web_server
   - platform: esphome
     password: !secret esp_ota_password
+
+web_server:
+  port: 80
+  auth:
+    username: "admin"
+    password: "parker"
 
 binary_sensor:
   - platform: gpio
