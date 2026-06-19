@@ -122,14 +122,14 @@ sensor:
         - 0.02  -> 12  # Full
     update_interval: 60s
 
-  - platform: template
-    id: pellets_kg
-    name: Pellets Kg
-    icon: mdi:weight-kilogram
-    unit_of_measurement: "kg"
-    lambda: >
-      return id(pellet_sacks_in_bin).state * 16; // Each sack weighs 16Kg
-    update_interval: 60s
+  # - platform: template
+  #   id: pellets_kg
+  #   name: Pellets Kg
+  #   icon: mdi:weight-kilogram
+  #   unit_of_measurement: "kg"
+  #   lambda: >
+  #     return id(pellet_sacks_in_bin).state * 16; // Each sack weighs 16Kg
+  #   update_interval: 60s
 
   - platform: dallas_temp
     address: 0x0D0008022A1D9710
