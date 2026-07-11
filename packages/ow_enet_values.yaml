@@ -11,11 +11,11 @@ sensor:
     name: "ow_pool_temp_smoothed"
     entity_id: sensor.ow_pool_temp
     filters:
-      - filter: lowpass
-        time_constant: 30
-        precision: 1
+      # - filter: lowpass
+      #   time_constant: 30
+      #   precision: 1
       - filter: time_simple_moving_average
-        window_size: "00:10"
+        window_size: "00:05"
         precision: 1
 
   - platform: daily_min_max
