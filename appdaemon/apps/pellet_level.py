@@ -16,6 +16,12 @@ class PelletLevel(hass.Hass):
       5) find first/top row having enough white pixels for N consecutive rows
       6) map level fraction -> sacks via piecewise-linear calibration
       7) publish sensor + save debug (cropped color) with red level line + mask (optional)
+
+    Added:
+      - EMA smoothing on sacks
+      - Rate limiting (max sacks change per minute)
+      - Lighting spike hold (ignore big mean-luma jumps)
+      - Optional bypass via HA entity (e.g., input_boolean.pellets_filling)
     """
 
     # ---------------- init ----------------
@@ -40,7 +46,7 @@ class PelletLevel(hass.Hass):
         self.crop_w = self._opt_int(self.args.get("crop_width_px"))
         self.crop_h = self._opt_int(self.args.get("crop_height_px"))
 
-        # Fixed mapping + thresholding (your request)
+        # Fixed mapping + thresholding
         self.threshold_mode: str = str(self.args.get("threshold_mode", "fixed")).lower()  # fixed|otsu|percentile
         self.threshold: Optional[int] = self._opt_int(self.args.get("threshold"))          # used if mode=fixed
         self.threshold_percentile: float = float(self.args.get("threshold_percentile", 90))
@@ -71,6 +77,17 @@ class PelletLevel(hass.Hass):
         self.interval_sec: int = int(self.args.get("interval_seconds", 300))
         self.process_delay: float = float(self.args.get("process_delay_sec", 1.0))
         self.process_wait_sec: float = float(self.args.get("process_wait_sec", 10.0))
+
+        # --- NEW: smoothing / rate limit / spike hold / bypass ---
+        self.ema_alpha: float = float(self.args.get("ema_alpha", 0.25))
+        self.max_delta_sacks_per_min: float = float(self.args.get("max_delta_sacks_per_min", 1.0))
+        self.brightness_hold_threshold: int = int(self.args.get("brightness_hold_threshold", 25))
+        self.bypass_entity: Optional[str] = self.args.get("bypass_entity")  # e.g. input_boolean.pellets_filling
+
+        # Internal state for smoothing
+        self._last_sacks: Optional[float] = None
+        self._last_mean_luma: Optional[float] = None
+        self._last_update_ts: Optional[float] = None
 
         for p in filter(None, [self.raw_path, self.mask_output_path, self.debug_snapshot_path]):
             os.makedirs(os.path.dirname(p), exist_ok=True)
@@ -195,7 +212,7 @@ class PelletLevel(hass.Hass):
             raw_white_frac = (white / total) if total else 0.0
             raw_white_pct = round(raw_white_frac * 100.0, 1)
 
-            # 5) level-line search (with top/bottom ignore + optional fractional target)
+            # 5) level-line search
             y_level = self._find_first_row_with_count(mask, self.min_run_px, self.min_run_rows)
 
             if y_level is None:
@@ -204,10 +221,28 @@ class PelletLevel(hass.Hass):
                 fill_frac = 1.0 - (y_level / float(h))
             fill_frac = max(0.0, min(1.0, fill_frac))
 
-            # 6) calibration -> sacks
-            sacks = self._interp_piecewise(self.cal_points, fill_frac)
-            sacks = max(0.0, min(12.0, sacks))
-            sacks = round(sacks, 1)
+            # 6) calibration -> sacks (RAW before smoothing)
+            raw_sacks = self._interp_piecewise(self.cal_points, fill_frac)
+            raw_sacks = max(0.0, min(12.0, raw_sacks))
+            raw_sacks = round(raw_sacks, 2)
+
+            # --- NEW: compute mean luminance for spike detection ---
+            # use pre-threshold grayscale (g_fixed) to detect lighting change
+            mean_luma = self._mean_luma(g_fixed)
+
+            # --- NEW: smoothing / rate limit / spike hold / bypass ---
+            bypass = False
+            if self.bypass_entity:
+                st = self.get_state(self.bypass_entity)
+                bypass = (st is not None and str(st).lower() == "on")
+
+            smoothed_sacks, clamped, held = self._apply_temporal_filters(
+                raw_sacks=raw_sacks,
+                mean_luma=mean_luma,
+                bypass=bypass
+            )
+
+            sacks = round(smoothed_sacks, 1)
             sacks_pct = round((sacks / 12.0) * 100.0, 0)
 
             # 7) debug line + save
@@ -237,21 +272,90 @@ class PelletLevel(hass.Hass):
                 attributes={
                     "unit_of_measurement": "sacks",
                     "friendly_name": "Pellet Level (Sacks)",
-                    "PercentageOfWhitePixels": raw_white_pct,  # unfiltered area %
-                    "FillLevelPercentage": sacks_pct,          # calibrated %
-                    "LevelLineFraction": round(fill_frac, 3),  # 0..1
+                    "PercentageOfWhitePixels": raw_white_pct,   # unfiltered area %
+                    "FillLevelPercentage": sacks_pct,           # calibrated % after smoothing
+                    "LevelLineFraction": round(fill_frac, 3),   # 0..1 from line
                     "threshold_used": thr,
                     "width": w,
                     "height": h,
                     "level_row": y_level if y_level is not None else -1,
                     "min_run_px": self.min_run_px,
                     "min_run_rows": self.min_run_rows,
+                    # diagnostics
+                    "RawSacks": raw_sacks,
+                    "SmoothedSacks": round(smoothed_sacks, 3),
+                    "MeanLuma": round(mean_luma, 1),
+                    "BrightnessDelta": None if self._last_mean_luma is None else round(mean_luma - self._last_mean_luma, 1),
+                    "SmoothingBypassed": bypass,
+                    "RateClamped": clamped,
+                    "BrightnessHeld": held,
+                    "ema_alpha": self.ema_alpha,
+                    "max_delta_sacks_per_min": self.max_delta_sacks_per_min,
+                    "brightness_hold_threshold": self.brightness_hold_threshold,
                 },
             )
 
-            self.log(f"Sacks={sacks} | %={sacks_pct} | area%={raw_white_pct} | thr={thr} | y={y_level}")
+            self.log(
+                f"Sacks={sacks} (raw={raw_sacks}) | %={sacks_pct} | area%={raw_white_pct} "
+                f"| thr={thr} | y={y_level} | luma={round(mean_luma,1)} | "
+                f"bypass={bypass} clamped={clamped} held={held}"
+            )
         except Exception as e:
             self.log(f"process error: {e}", level="ERROR")
+
+    # ---------------- temporal filters ----------------
+    def _apply_temporal_filters(self, raw_sacks: float, mean_luma: float, bypass: bool):
+        """
+        Returns (smoothed_sacks, clamped_flag, held_flag)
+        - EMA smoothing
+        - Rate limit (max delta per minute)
+        - Brightness spike hold (ignore update on large luma jumps)
+        - Bypass skips all filters
+        """
+        now = time.time()
+        clamped = False
+        held = False
+
+        if self._last_sacks is None:
+            # first sample: initialize immediately
+            self._last_sacks = raw_sacks
+            self._last_mean_luma = mean_luma
+            self._last_update_ts = now
+            return raw_sacks, False, False
+
+        # Spike detection (lighting change)
+        luma_delta = abs(mean_luma - (self._last_mean_luma if self._last_mean_luma is not None else mean_luma))
+        if (not bypass) and (self.brightness_hold_threshold > 0) and (luma_delta >= self.brightness_hold_threshold):
+            # hold previous value; don't update EMA or timestamp, but refresh last luma so we don't lock forever
+            held = True
+            self._last_mean_luma = mean_luma
+            return self._last_sacks, False, True
+
+        new_val = raw_sacks
+
+        if not bypass:
+            # EMA smoothing
+            alpha = max(0.0, min(1.0, float(self.ema_alpha)))
+            ema = alpha * new_val + (1.0 - alpha) * self._last_sacks
+
+            # Rate limit (per-minute budget -> per-interval)
+            if self.max_delta_sacks_per_min > 0 and self.interval_sec > 0:
+                allowed = self.max_delta_sacks_per_min * (self.interval_sec / 60.0)
+                delta = ema - self._last_sacks
+                if abs(delta) > allowed:
+                    ema = self._last_sacks + (allowed if delta > 0 else -allowed)
+                    clamped = True
+            smoothed = ema
+        else:
+            # Bypass: accept raw immediately
+            smoothed = new_val
+
+        # commit state for next loop
+        self._last_sacks = smoothed
+        self._last_mean_luma = mean_luma
+        self._last_update_ts = now
+
+        return smoothed, clamped, held
 
     # ---------------- detectors & helpers ----------------
     def _find_first_row_with_count(self, mask: Image.Image, min_white_px: int, min_rows: int) -> Optional[int]:
@@ -263,6 +367,7 @@ class PelletLevel(hass.Hass):
 
         pixels = mask.load()
         consec = 0
+        # compute target count once per row
         for y in range(top, bottom):
             white_count = 0
             for x in range(w):
@@ -278,6 +383,17 @@ class PelletLevel(hass.Hass):
             else:
                 consec = 0
         return None
+
+    def _mean_luma(self, gray_img: Image.Image) -> float:
+        # PIL-only mean; avoids numpy
+        hist = gray_img.histogram()
+        total = sum(hist)
+        if total <= 0:
+            return 0.0
+        s = 0
+        for i, c in enumerate(hist):
+            s += i * c
+        return s / float(total)
 
     def _parse_calibration(self, filt) -> List[Tuple[float, float]]:
         if not isinstance(filt, list):
