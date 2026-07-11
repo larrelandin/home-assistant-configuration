@@ -37,18 +37,28 @@ pellet_level:
   # Level-line detection
   min_run_px: 15 # contiguous white pixels needed in a row
   min_run_rows: 3 # must hold for this many consecutive rows
+  
+  # OPTIONAL smoothing & spike handling
+  ema_alpha: 0.25                 # 0..1 (lower = slower). EMA smoothing on sacks.
+  max_delta_sacks_per_min: 1.0    # clamp per-minute change; e.g. 1.0 sack/min
+  brightness_hold_threshold: 25   # 0..255 mean-luma jump to treat as lighting spike
 
+  # OPTIONAL bypass (when filling pellets etc.). If omitted, bypass is off.
+  bypass_entity: input_boolean.pellets_filling
+  
   # Main sensor
   sensor_entity: sensor.pellet_level
 
   # Calibration: raw fraction (0..1) -> sacks (0..12)
   filter:
     - calibrate_linear:
-        - 0.027  -> 0 #M
+        - 0.2  -> 0 #M
         - 0.44 -> 1
-        - 0497 -> 2 #M
+        - 0.497 -> 2 #M
         - 0.51 -> 2.5 #M
-        - 0.585 -> 3.5
+        - 0.535 -> 3.5 #M
+        - 0.647 -> 6 #M
+        - 0.792 -> 8.5 #M
         - 0.891 -> 9.5
         - 0.915 -> 12 #M
 
