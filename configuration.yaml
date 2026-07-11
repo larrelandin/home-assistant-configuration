@@ -49,10 +49,6 @@ logger:
     custom_components.daily_min_max: debug
     custom_components.daily_min_max.sensor: debug
 
-frontend:
-  extra_module_url:
-    - /hacsfiles/lovelace-card-mod/card-mod.js?hacstag=12345678901
-
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
