@@ -1,0 +1,82 @@
+input_datetime:
+  truenas_tank_low_space_last_notified:
+    name: TrueNAS Tank Low Space Last Notified
+    has_date: true
+    has_time: true
+
+  truenas_disk_errors_last_notified:
+    name: TrueNAS Disk Errors Last Notified
+    has_date: true
+    has_time: true
+
+automation:
+  - id: truenas_tank_low_space_persistent_notification
+    alias: TrueNAS Tank Low Space Persistent Notification
+    mode: single
+    triggers:
+      - trigger: time
+        at: "12:30:00"
+    conditions:
+      - condition: numeric_state
+        entity_id: sensor.truenas_tank_used_percent
+        above: 80
+      - condition: template
+        value_template: >
+          {% set last = states('input_datetime.truenas_tank_low_space_last_notified') %}
+          {{ last in ['unknown', 'unavailable', 'none', ''] or
+             (now() - last | as_datetime | as_local).total_seconds() >= 7 * 24 * 3600 }}
+    actions:
+      - action: persistent_notification.create
+        data:
+          notification_id: truenas_tank_low_space
+          title: "TrueNAS tank disk space is low"
+          message: >
+            The TrueNAS pool tank is {{ states('sensor.truenas_tank_used_percent') }}% used.
+
+            Free space: {{ states('sensor.truenas_tank_free_space') }} GB
+            Pool status: {{ states('sensor.truenas_tank_status') }}
+
+            This notification will stay until dismissed. If the problem still exists after 7 days, it will be created again.
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.truenas_tank_low_space_last_notified
+        data:
+          datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+
+  - id: truenas_disk_errors_persistent_notification
+    alias: TrueNAS Disk Errors Persistent Notification
+    mode: single
+    triggers:
+      - trigger: time
+        at: "12:30:00"
+    conditions:
+      - condition: template
+        value_template: >
+          {{ states('sensor.truenas_zpool_health') not in ['healthy', 'unknown', 'unavailable', 'none', ''] or
+             states('sensor.truenas_tank_status') not in ['ONLINE', 'unknown', 'unavailable', 'none', ''] or
+             states('sensor.truenas_boot_pool_status') not in ['ONLINE', 'unknown', 'unavailable', 'none', ''] }}
+      - condition: template
+        value_template: >
+          {% set last = states('input_datetime.truenas_disk_errors_last_notified') %}
+          {{ last in ['unknown', 'unavailable', 'none', ''] or
+             (now() - last | as_datetime | as_local).total_seconds() >= 7 * 24 * 3600 }}
+    actions:
+      - action: persistent_notification.create
+        data:
+          notification_id: truenas_disk_errors
+          title: "TrueNAS disk or pool error detected"
+          message: >
+            TrueNAS reports a disk or pool health problem.
+
+            Overall zpool health: {{ states('sensor.truenas_zpool_health') }}
+            tank status: {{ states('sensor.truenas_tank_status') }}
+            boot-pool status: {{ states('sensor.truenas_boot_pool_status') }}
+
+            Details: {{ state_attr('sensor.truenas_zpool_health', 'details') }}
+
+            This notification will stay until dismissed. If the problem still exists after 7 days, it will be created again.
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.truenas_disk_errors_last_notified
+        data:
+          datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"

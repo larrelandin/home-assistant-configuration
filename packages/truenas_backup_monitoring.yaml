@@ -1,0 +1,162 @@
+command_line:
+  - sensor:
+      name: TrueNAS Backup Status
+      unique_id: truenas_backup_status
+      command: /config/scripts/truenas_backup_status.sh
+      command_timeout: 30
+      scan_interval: 3600
+      value_template: "{{ value_json.last_success }}"
+      json_attributes:
+        - current_size_bytes
+        - pool_size_bytes
+        - used_space_bytes
+        - free_space_bytes
+
+template:
+  - sensor:
+      - name: TrueNAS Backup Last Success
+        unique_id: truenas_backup_last_success
+        device_class: timestamp
+        availability: >
+          {{ states('sensor.truenas_backup_status') not in ['unknown', 'unavailable', 'none', ''] }}
+        state: >
+          {{ states('sensor.truenas_backup_status') }}
+
+      - name: TrueNAS Backup Total Size
+        unique_id: truenas_backup_total_size
+        device_class: data_size
+        unit_of_measurement: GB
+        state_class: measurement
+        availability: >
+          {{ state_attr('sensor.truenas_backup_status', 'current_size_bytes') | float(none) is number }}
+        state: >
+          {{ (state_attr('sensor.truenas_backup_status', 'current_size_bytes') | float / 1024 / 1024 / 1024) | round(1) }}
+
+      - name: TrueNAS Backup Unused Space
+        unique_id: truenas_backup_unused_space
+        device_class: data_size
+        unit_of_measurement: GB
+        state_class: measurement
+        availability: >
+          {{ state_attr('sensor.truenas_backup_status', 'free_space_bytes') | float(none) is number }}
+        state: >
+          {{ (state_attr('sensor.truenas_backup_status', 'free_space_bytes') | float / 1024 / 1024 / 1024) | round(1) }}
+
+      - name: TrueNAS Backup Pool Size
+        unique_id: truenas_backup_pool_size
+        device_class: data_size
+        unit_of_measurement: GB
+        state_class: measurement
+        availability: >
+          {{ state_attr('sensor.truenas_backup_status', 'pool_size_bytes') | float(none) is number }}
+        state: >
+          {{ (state_attr('sensor.truenas_backup_status', 'pool_size_bytes') | float / 1024 / 1024 / 1024) | round(1) }}
+
+      - name: TrueNAS Backup Unused Space Percent
+        unique_id: truenas_backup_unused_space_percent
+        unit_of_measurement: "%"
+        state_class: measurement
+        availability: >
+          {% set free = state_attr('sensor.truenas_backup_status', 'free_space_bytes') | float(none) %}
+          {% set total = state_attr('sensor.truenas_backup_status', 'pool_size_bytes') | float(none) %}
+          {{ free is number and total is number and total > 0 }}
+        state: >
+          {% set free = state_attr('sensor.truenas_backup_status', 'free_space_bytes') | float %}
+          {% set total = state_attr('sensor.truenas_backup_status', 'pool_size_bytes') | float %}
+          {{ (free / total * 100) | round(1) }}
+
+      - name: TrueNAS Backup Age Hours
+        unique_id: truenas_backup_age_hours
+        unit_of_measurement: h
+        state_class: measurement
+        availability: >
+          {{ states('sensor.truenas_backup_last_success') not in ['unknown', 'unavailable', 'none', ''] }}
+        state: >
+          {{ ((now() - states('sensor.truenas_backup_last_success') | as_datetime | as_local).total_seconds() / 3600) | round(1) }}
+
+input_datetime:
+  truenas_backup_low_space_last_notified:
+    name: TrueNAS Backup Low Space Last Notified
+    has_date: true
+    has_time: true
+
+  truenas_backup_stale_last_notified:
+    name: TrueNAS Backup Stale Last Notified
+    has_date: true
+    has_time: true
+
+automation:
+  - id: truenas_backup_low_space_persistent_notification
+    alias: TrueNAS Backup Low Space Persistent Notification
+    mode: single
+    triggers:
+      - trigger: time
+        at: "12:00:00"
+    actions:
+      - action: homeassistant.update_entity
+        target:
+          entity_id: sensor.truenas_backup_status
+      - delay: "00:00:15"
+      - if:
+          - condition: numeric_state
+            entity_id: sensor.truenas_backup_unused_space_percent
+            below: 20
+          - condition: template
+            value_template: >
+              {% set last = states('input_datetime.truenas_backup_low_space_last_notified') %}
+              {{ last in ['unknown', 'unavailable', 'none', ''] or
+                 (now() - last | as_datetime | as_local).total_seconds() >= 7 * 24 * 3600 }}
+        then:
+          - action: persistent_notification.create
+            data:
+              notification_id: truenas_backup_low_space
+              title: "TrueNAS backup disk space is low"
+              message: >
+                The Proxmox backup pool has {{ states('sensor.truenas_backup_unused_space_percent') }}% free space left.
+
+                Free space: {{ states('sensor.truenas_backup_unused_space') }} GB
+                Pool size: {{ states('sensor.truenas_backup_pool_size') }} GB
+
+                This notification will stay until dismissed. If the problem still exists after 7 days, it will be created again.
+          - action: input_datetime.set_datetime
+            target:
+              entity_id: input_datetime.truenas_backup_low_space_last_notified
+            data:
+              datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+
+  - id: truenas_backup_stale_persistent_notification
+    alias: TrueNAS Backup Stale Persistent Notification
+    mode: single
+    triggers:
+      - trigger: time
+        at: "12:00:00"
+    actions:
+      - action: homeassistant.update_entity
+        target:
+          entity_id: sensor.truenas_backup_status
+      - delay: "00:00:15"
+      - if:
+          - condition: numeric_state
+            entity_id: sensor.truenas_backup_age_hours
+            above: 48
+          - condition: template
+            value_template: >
+              {% set last = states('input_datetime.truenas_backup_stale_last_notified') %}
+              {{ last in ['unknown', 'unavailable', 'none', ''] or
+                 (now() - last | as_datetime | as_local).total_seconds() >= 7 * 24 * 3600 }}
+        then:
+          - action: persistent_notification.create
+            data:
+              notification_id: truenas_backup_stale
+              title: "TrueNAS backup has not run recently"
+              message: >
+                The last successful TrueNAS backup was {{ states('sensor.truenas_backup_last_success') }}.
+
+                Backup age: {{ states('sensor.truenas_backup_age_hours') }} hours
+
+                This notification will stay until dismissed. If the problem still exists after 7 days, it will be created again.
+          - action: input_datetime.set_datetime
+            target:
+              entity_id: input_datetime.truenas_backup_stale_last_notified
+            data:
+              datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
