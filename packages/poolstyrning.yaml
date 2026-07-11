@@ -22,28 +22,38 @@ template:
       - name: Pool elkostnad nu
         unit_of_measurement: "SEK"
         unique_id: 86640ace-1e7b-4c49-89de-644813eddac0
+        availability: >
+          {{ states('sensor.cirkulationspump_pool_elkostnad_nu') | is_number
+            and states('sensor.varmepump_pool_elkostnad_nu') | is_number }}
         state: >
-          {{ states('sensor.cirkulationspump_pool_elkostnad_nu') | float(0) + states('sensor.varmepump_pool_elkostnad_nu') | float(0) }}
+          {{ (states('sensor.cirkulationspump_pool_elkostnad_nu') | float
+              + states('sensor.varmepump_pool_elkostnad_nu') | float) | round(2) }}
       - name: Värmepump pool elkostnad nu
         unit_of_measurement: "SEK"
         unique_id: 99b0916d-0e8d-4568-b7e3-59524584bb30
+        availability: >
+          {{ states('sensor.nuvarande_elpris') | is_number
+            and states('sensor.varmepump_pool_energy_per_hour') | is_number }}
         state: >
-          {% if not is_state('sensor.nuvarande_elpris', 'unavailable') and not is_state('sensor.varmepump_pool_energy_per_hour', 'unavailable') and not is_state('sensor.nuvarande_elpris', 'unknown') and not is_state('sensor.varmepump_pool_energy_per_hour', 'unknown') %}
-          {{ states('sensor.nuvarande_elpris') | float * states('sensor.varmepump_pool_energy_per_hour') | float }}
-          {% endif %}
+          {{ (states('sensor.nuvarande_elpris') | float
+              * states('sensor.varmepump_pool_energy_per_hour') | float) | round(2) }}
       - name: Cirkulationspump pool elkostnad nu
         unit_of_measurement: "SEK"
         unique_id: aaeb8a84-34f3-4bf6-bf56-3a48d67573ef
+        availability: >
+          {{ states('sensor.nuvarande_elpris') | is_number
+            and states('sensor.cirkulationspump_pool_energy_per_hour') | is_number }}
         state: >
-          {% if not is_state('sensor.nuvarande_elpris', 'unavailable') and not is_state('sensor.cirkulationspump_pool_energy_per_hour', 'unavailable') and not is_state('sensor.nuvarande_elpris', 'unknown') and not is_state('sensor.cirkulationspump_pool_energy_per_hour', 'unknown') %}
-          {{ states('sensor.nuvarande_elpris') | float * states('sensor.cirkulationspump_pool_energy_per_hour') | float }}
-          {% endif %}
+          {{ (states('sensor.nuvarande_elpris') | float
+              * states('sensor.cirkulationspump_pool_energy_per_hour') | float) | round(2) }}
   - sensor:
       - name: Pool elkostnad igår
         unit_of_measurement: "SEK"
         unique_id: f7cd09e5-4213-4caa-b426-1a598e623bd2
+        availability: >
+          {{ state_attr('sensor.daglig_elkostnad_pool', 'last_period') | is_number }}
         state: >
-          {{ state_attr('sensor.daglig_elkostnad_pool', 'last_period') | float }}
+          {{ state_attr('sensor.daglig_elkostnad_pool', 'last_period') | float | round(2) }}
 
 utility_meter:
   cirkulationspump_pool_energy_per_hour:
