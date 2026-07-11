@@ -9,6 +9,14 @@ sensor:
 
 template:
   - sensor:
+      - name: pellets_kg
+        unique_id: f2743249-7a51-4673-bb54-705e3643c86c
+        unit_of_measurement: "kg"
+        icon: mdi:weight-kilogram
+        state: >
+          {{ states('sensor.pellet_level') | float(1) * 16 }}
+
+  - sensor:
       - name: pellets_kg_daily_min_inverted
         unit_of_measurement: "Kg"
         state: >
@@ -104,3 +112,8 @@ utility_meter:
     unique_id: pellets_kg_since_last_fill
     source: sensor.pellets_kg_daily_min_inverted
     net_consumption: false
+
+input_boolean:
+  pellets_filling:
+    name: Pellets filling
+    icon: mdi:bucket-outline
