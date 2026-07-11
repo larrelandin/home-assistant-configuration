@@ -38,15 +38,15 @@ binary_sensor:
       furnace_heating_falling:
         entity_id: sensor.panntemperatur_for_trendberakning
         friendly_name: "Panntemperatur sjunkande"
-        sample_duration: 50
-        min_gradient: -0.0008
+        sample_duration: 900
+        min_gradient: -0.0005
         device_class: cold
 
       furnace_heating_rising:
         entity_id: sensor.panntemperatur_for_trendberakning
         friendly_name: "Panntemperatur stigande"
-        sample_duration: 50
-        min_gradient: 0.0008
+        sample_duration: 600
+        min_gradient: 0.0005
         device_class: heat
 
 # Kontroller för värme
