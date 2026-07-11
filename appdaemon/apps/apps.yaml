@@ -5,13 +5,13 @@ pellet_level:
   camera_entity: camera.pellet_snapshot
 
   # HA Core writes here (must be /config/... and allowlisted)
-  ha_snapshot_path: /config/www/snapshots/pellet_raw.jpg
+  ha_snapshot_path: /config/www/snapshots/pellet_snapshot_raw.jpg
 
   # AppDaemon reads/writes here (inside AppDaemon add-on)
-  raw_path: /homeassistant/www/snapshots/pellet_raw.jpg
+  raw_path: /homeassistant/www/snapshots/pellet_snapshot_raw.jpg
   # Optional: save mask for visual verification (comment out to disable)
   mask_output_path: /homeassistant/www/snapshots/pellet_mask.png
-  debug_snapshot_path: /homeassistant/www/snapshots/pellet_debug.jpg
+  debug_snapshot_path: /homeassistant/www/snapshots/pellet_snapshot.jpg
   debug_line_thickness: 2
 
   # Your tuned ROI
