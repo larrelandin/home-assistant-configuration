@@ -28,6 +28,13 @@ default_config:
 recorder:
   db_url: !secret connectionstring_mariadb
   purge_keep_days: 30
+  exclude:
+    entities:
+      - sensor.charge_amps_schedule
+      - sensor.pool_heatpump_schedule
+      - sensor.poolpump_schedule
+      - sensor.helper_bussar_fran_gastelyckan_o
+      - sensor.helper_buss_till_stortorget
 
 swedish_calendar:
 
