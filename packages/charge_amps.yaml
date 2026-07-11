@@ -8,12 +8,11 @@ template:
       - name: "Charge Amps total consumption latest charge kWh"
         unique_id: "charge_amps_total_consumption_latest_charge_kwh"
         unit_of_measurement: "kWh"
+        availability: >
+          {{ is_state('sensor.charge_amps_charging_status', 'Charging')
+            and states('sensor.charge_amps_total_energy') | is_number }}
         state: >
-          {% if is_state('sensor.charge_amps_charging_status', 'Charging') %}
-            {{ state_attr('sensor.charge_amps_charging_status', 'total_consumption_kwh') }}
-          {% else %}
-            unknown
-          {% endif %}
+          {{ states('sensor.charge_amps_total_energy') | float | round(2) }}
       - name: "Charge Amps total consumption previous charge kWh"
         unique_id: e7a6f709-59d9-421d-9240-f96564985cac
         unit_of_measurement: "kWh"
@@ -24,11 +23,11 @@ template:
         unit_of_measurement: "SEK"
         state: >
           {{ states('input_number.charge_amps_previous_cost_sek_helper') | round(2) }}
-      - name: "Charge Amps Max Current"
-        unique_id: 17c0d248-4e32-4dfd-8573-599f34ace07d
-        unit_of_measurement: "A"
-        state: >
-          {{ state_attr("switch.charge_amps_ev_type2", "max_current") }}
+      # - name: "Charge Amps Max Current"
+      #   unique_id: 17c0d248-4e32-4dfd-8573-599f34ace07d
+      #   unit_of_measurement: "A"
+      #   state: >
+      #     {{ state_attr("switch.charge_amps_ev_type2", "max_current") }}
       - name: "Dynamic Swishlink current Halo Charge"
         state: >
           https://app.swish.nu/1/p/sw/?sw=0733500650&amt={{states('sensor.charge_amps_last_charge_cost') | round(2)}}&cur=SEK&msg=Elbilsladdning%20{{states('sensor.charge_amps_last_charge_kwh')}}kWh&src=qr
