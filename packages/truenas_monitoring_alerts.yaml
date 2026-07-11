@@ -1,4 +1,57 @@
+input_text:
+  truenas_tank_status_value:
+    name: TrueNAS Tank Status Value
+    max: 255
+
+  truenas_boot_pool_status_value:
+    name: TrueNAS Boot Pool Status Value
+    max: 255
+
+  truenas_zpool_health_value:
+    name: TrueNAS Zpool Health Value
+    max: 255
+
+  truenas_zpool_health_details_value:
+    name: TrueNAS Zpool Health Details Value
+    max: 255
+
+input_number:
+  truenas_tank_used_percent_value:
+    name: TrueNAS Tank Used Percent Value
+    min: 0
+    max: 100
+    step: 0.1
+    mode: box
+
+  truenas_tank_free_space_value:
+    name: TrueNAS Tank Free Space Value
+    min: 0
+    max: 1000000
+    step: 0.1
+    mode: box
+    unit_of_measurement: GB
+
+  truenas_boot_pool_used_percent_value:
+    name: TrueNAS Boot Pool Used Percent Value
+    min: 0
+    max: 100
+    step: 0.1
+    mode: box
+
+  truenas_boot_pool_free_space_value:
+    name: TrueNAS Boot Pool Free Space Value
+    min: 0
+    max: 1000000
+    step: 0.1
+    mode: box
+    unit_of_measurement: GB
+
 input_datetime:
+  truenas_monitoring_last_update_value:
+    name: TrueNAS Monitoring Last Update Value
+    has_date: true
+    has_time: true
+
   truenas_tank_low_space_last_notified:
     name: TrueNAS Tank Low Space Last Notified
     has_date: true
@@ -8,6 +61,56 @@ input_datetime:
     name: TrueNAS Disk Errors Last Notified
     has_date: true
     has_time: true
+
+template:
+  - sensor:
+      - name: TrueNAS Tank Status
+        unique_id: truenas_tank_status
+        state: "{{ states('input_text.truenas_tank_status_value') }}"
+
+      - name: TrueNAS Tank Used Percent
+        unique_id: truenas_tank_used_percent
+        unit_of_measurement: "%"
+        state_class: measurement
+        state: "{{ states('input_number.truenas_tank_used_percent_value') | float(0) }}"
+
+      - name: TrueNAS Tank Free Space
+        unique_id: truenas_tank_free_space
+        device_class: data_size
+        unit_of_measurement: GB
+        state_class: measurement
+        state: "{{ states('input_number.truenas_tank_free_space_value') | float(0) }}"
+
+      - name: TrueNAS Boot Pool Status
+        unique_id: truenas_boot_pool_status
+        state: "{{ states('input_text.truenas_boot_pool_status_value') }}"
+
+      - name: TrueNAS Boot Pool Used Percent
+        unique_id: truenas_boot_pool_used_percent
+        unit_of_measurement: "%"
+        state_class: measurement
+        state: "{{ states('input_number.truenas_boot_pool_used_percent_value') | float(0) }}"
+
+      - name: TrueNAS Boot Pool Free Space
+        unique_id: truenas_boot_pool_free_space
+        device_class: data_size
+        unit_of_measurement: GB
+        state_class: measurement
+        state: "{{ states('input_number.truenas_boot_pool_free_space_value') | float(0) }}"
+
+      - name: TrueNAS Zpool Health
+        unique_id: truenas_zpool_health
+        state: "{{ states('input_text.truenas_zpool_health_value') }}"
+        attributes:
+          details: "{{ states('input_text.truenas_zpool_health_details_value') }}"
+
+      - name: TrueNAS Monitoring Last Update
+        unique_id: truenas_monitoring_last_update
+        device_class: timestamp
+        availability: >
+          {{ states('input_datetime.truenas_monitoring_last_update_value') not in ['unknown', 'unavailable', 'none', ''] }}
+        state: >
+          {{ states('input_datetime.truenas_monitoring_last_update_value') | as_datetime | as_local }}
 
 automation:
   - id: truenas_tank_low_space_persistent_notification
