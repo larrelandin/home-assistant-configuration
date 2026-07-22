@@ -56,9 +56,11 @@ template:
           {{ states('sensor.nuvarande_elpris') | is_number
             and states('sensor.charge_amps_energy_per_hour') | is_number }}
         state: >
-          {{ (states('sensor.nuvarande_elpris') | float
-              * states('sensor.charge_amps_energy_per_hour') | float
-              * 1.2) | round(2) }}
+          {{ (
+            (states('sensor.nuvarande_elpris') | float / 100)
+            * (states('sensor.charge_amps_energy_per_hour') | float)
+            * 1.2
+          ) | round(2) }}
 
 utility_meter:
   charge_amps_energy_per_hour:
