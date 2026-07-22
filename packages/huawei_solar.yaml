@@ -19,11 +19,11 @@ template:
         unit_of_measurement: "kW"
         icon: mdi:solar-power
         availability: >
-          {{ states('sensor.inverter_pv_string_02_voltage') | is_number
-            and states('sensor.inverter_pv_string_02_current') | is_number }}
+          {{ states('sensor.inverter_pv_2_voltage') | is_number
+            and states('sensor.inverter_pv_2_current') | is_number }}
         state: >
-          {{ (states('sensor.inverter_pv_string_02_voltage') | float
-              * states('sensor.inverter_pv_string_02_current') | float
+          {{ (states('sensor.inverter_pv_2_voltage') | float
+              * states('sensor.inverter_pv_2_current') | float
               / 1000) | round(2) }}
 
   - sensor:
@@ -31,9 +31,9 @@ template:
         unit_of_measurement: "kW"
         icon: mdi:solar-power
         availability: >
-          {{ states('sensor.inverter_pv_string_01_voltage') | is_number
-            and states('sensor.inverter_pv_string_01_current') | is_number }}
+          {{ states('sensor.inverter_pv_1_voltage') | is_number
+            and states('sensor.inverter_pv_1_current') | is_number }}
         state: >
-          {{ (states('sensor.inverter_pv_string_01_voltage') | float
-              * states('sensor.inverter_pv_string_01_current') | float
+          {{ (states('sensor.inverter_pv_1_voltage') | float
+              * states('sensor.inverter_pv_1_current') | float
               / 1000) | round(2) }}
