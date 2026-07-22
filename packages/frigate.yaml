@@ -1,0 +1,15 @@
+mqtt:
+  binary_sensor:
+    - name: Frigate Pool Cover
+      unique_id: frigate_pool_cover
+      state_topic: "frigate/poolcamera/classification/Pool cover"
+      payload_on: "Open"
+      payload_off: "Closed"
+      device_class: opening
+      icon: mdi:pool
+      device:
+        identifiers:
+          - frigate_pool_cover
+        name: Frigate Pool Cover
+        manufacturer: Frigate
+        model: Custom state classification
