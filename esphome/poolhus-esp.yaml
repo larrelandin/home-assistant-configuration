@@ -51,9 +51,5 @@ sensor:
     update_interval: 60s
 
 switch:
-  - platform: gpio
-    pin: D3
-    id: buzzer
-    restore_mode: ALWAYS_OFF
   - platform: restart
     name: "Poolhus ESP restart"
