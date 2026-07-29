@@ -37,3 +37,13 @@ template:
           {{ (states('sensor.inverter_pv_1_voltage') | float
               * states('sensor.inverter_pv_1_current') | float
               / 1000) | round(2) }}
+
+utility_meter:
+  daily_production_pv1:
+    name: Daglig elproduktion PV1
+    source: sensor.pv_string_01_power
+    cycle: daily
+  daily_production_pv2:
+    name: Daglig elproduktion PV2
+    source: sensor.pv_string_02_power
+    cycle: daily
