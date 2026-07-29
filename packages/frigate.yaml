@@ -2,7 +2,7 @@ mqtt:
   binary_sensor:
     - name: Frigate Pool Cover
       unique_id: frigate_pool_cover
-      state_topic: "frigate/poolcamera/classification/Pool cover"
+      state_topic: "homeassistant/pool_cover/state"
       payload_on: "Open"
       payload_off: "Closed"
       device_class: opening
@@ -13,3 +13,22 @@ mqtt:
         name: Frigate Pool Cover
         manufacturer: Frigate
         model: Custom state classification
+
+automation:
+  - id: frigate_pool_cover_cache_mqtt_state
+    alias: "Frigate - Cache pool cover state"
+    triggers:
+      - trigger: mqtt
+        topic: "frigate/poolcamera/classification/Pool cover"
+
+    conditions:
+      - condition: template
+        value_template: "{{ trigger.payload in ['Open', 'Closed'] }}"
+
+    actions:
+      - action: mqtt.publish
+        data:
+          topic: "homeassistant/pool_cover/state"
+          payload: "{{ trigger.payload }}"
+          qos: 1
+          retain: true
