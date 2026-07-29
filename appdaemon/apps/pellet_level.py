@@ -1,5 +1,8 @@
 import os
 import time
+import math
+from collections import deque
+from statistics import median
 from typing import Optional, List, Tuple
 
 import appdaemon.plugins.hass.hassapi as hass
@@ -83,11 +86,46 @@ class PelletLevel(hass.Hass):
         self.max_delta_sacks_per_min: float = float(self.args.get("max_delta_sacks_per_min", 1.0))
         self.brightness_hold_threshold: int = int(self.args.get("brightness_hold_threshold", 25))
         self.bypass_entity: Optional[str] = self.args.get("bypass_entity")  # e.g. input_boolean.pellets_filling
+        self.valid_mean_luma_min = self._opt_float(self.args.get("valid_mean_luma_min"))
+        self.valid_mean_luma_max = self._opt_float(self.args.get("valid_mean_luma_max"))
+
+        self.raw_median_window_size: int = max(1, int(self.args.get("raw_median_window_size", 7)))
+        if self.raw_median_window_size % 2 == 0:
+            self.raw_median_window_size += 1
+        self.raw_min_valid_samples: int = max(
+            1,
+            min(
+                self.raw_median_window_size,
+                int(self.args.get("raw_min_valid_samples", 5)),
+            ),
+        )
+        self.brightness_confirmation_samples: int = max(
+            1,
+            int(
+                self.args.get(
+                    "brightness_confirmation_samples",
+                    self.raw_min_valid_samples,
+                )
+            ),
+        )
 
         # Internal state for smoothing
         self._last_sacks: Optional[float] = None
         self._last_mean_luma: Optional[float] = None
         self._last_update_ts: Optional[float] = None
+        self._raw_sacks_window = deque(maxlen=self.raw_median_window_size)
+        self._pending_mean_luma: Optional[float] = None
+        self._pending_mean_luma_count: int = 0
+
+        # Preserve the last published HA value across an AppDaemon restart. Without
+        # this, the first camera frame becomes the new baseline even if it is bad.
+        try:
+            restored_sacks = float(self.get_state(self.sensor_entity))
+            if math.isfinite(restored_sacks) and 0.0 <= restored_sacks <= 12.0:
+                self._last_sacks = restored_sacks
+                self.log(f"Restored previous pellet level: {restored_sacks} sacks")
+        except (TypeError, ValueError):
+            pass
 
         for p in filter(None, [self.raw_path, self.mask_output_path, self.debug_snapshot_path]):
             os.makedirs(os.path.dirname(p), exist_ok=True)
@@ -236,11 +274,57 @@ class PelletLevel(hass.Hass):
                 st = self.get_state(self.bypass_entity)
                 bypass = (st is not None and str(st).lower() == "on")
 
-            smoothed_sacks, clamped, held = self._apply_temporal_filters(
+            measurement_valid, validation_reason = self._validate_measurement(
+                y_level=y_level,
                 raw_sacks=raw_sacks,
                 mean_luma=mean_luma,
-                bypass=bypass
             )
+
+            median_raw_sacks = None
+            clamped = False
+            held = False
+
+            if measurement_valid and bypass:
+                # Filling mode intentionally accepts a valid raw reading immediately.
+                self._raw_sacks_window.clear()
+                self._raw_sacks_window.append(raw_sacks)
+                median_raw_sacks = raw_sacks
+                smoothed_sacks, clamped, held = self._apply_temporal_filters(
+                    raw_sacks=raw_sacks,
+                    mean_luma=mean_luma,
+                    bypass=True,
+                )
+            elif measurement_valid:
+                self._raw_sacks_window.append(raw_sacks)
+                if len(self._raw_sacks_window) >= self.raw_min_valid_samples:
+                    median_raw_sacks = float(median(self._raw_sacks_window))
+                    smoothed_sacks, clamped, held = self._apply_temporal_filters(
+                        raw_sacks=median_raw_sacks,
+                        mean_luma=mean_luma,
+                        bypass=False,
+                    )
+                else:
+                    validation_reason = (
+                        f"warming_up_raw_window_"
+                        f"{len(self._raw_sacks_window)}_of_{self.raw_min_valid_samples}"
+                    )
+                    held = True
+                    smoothed_sacks = self._last_sacks
+            else:
+                held = True
+                smoothed_sacks = self._last_sacks
+
+            if held and validation_reason == "accepted":
+                validation_reason = "brightness_change_pending"
+
+            # Until enough valid frames exist, keep the existing HA state unchanged.
+            if smoothed_sacks is None:
+                self.log(
+                    f"Holding pellet level; no accepted baseline yet "
+                    f"(raw={raw_sacks}, reason={validation_reason})",
+                    level="WARNING",
+                )
+                return
 
             sacks = round(smoothed_sacks, 1)
             sacks_pct = round((sacks / 12.0) * 100.0, 0)
@@ -283,9 +367,21 @@ class PelletLevel(hass.Hass):
                     "min_run_rows": self.min_run_rows,
                     # diagnostics
                     "RawSacks": raw_sacks,
+                    "MedianRawSacks": (
+                        None if median_raw_sacks is None else round(median_raw_sacks, 3)
+                    ),
                     "SmoothedSacks": round(smoothed_sacks, 3),
                     "MeanLuma": round(mean_luma, 1),
                     "BrightnessDelta": None if self._last_mean_luma is None else round(mean_luma - self._last_mean_luma, 1),
+                    "FrameValid": measurement_valid,
+                    "MeasurementValid": (
+                        measurement_valid
+                        and median_raw_sacks is not None
+                        and not held
+                    ),
+                    "ValidationReason": validation_reason,
+                    "RawWindowSamples": len(self._raw_sacks_window),
+                    "RawMedianWindowSize": self.raw_median_window_size,
                     "SmoothingBypassed": bypass,
                     "RateClamped": clamped,
                     "BrightnessHeld": held,
@@ -296,7 +392,9 @@ class PelletLevel(hass.Hass):
             )
 
             self.log(
-                f"Sacks={sacks} (raw={raw_sacks}) | %={sacks_pct} | area%={raw_white_pct} "
+                f"Sacks={sacks} (raw={raw_sacks}, median={median_raw_sacks}) | "
+                f"valid={measurement_valid} reason={validation_reason} | "
+                f"%={sacks_pct} | area%={raw_white_pct} "
                 f"| thr={thr} | y={y_level} | luma={round(mean_luma,1)} | "
                 f"bypass={bypass} clamped={clamped} held={held}"
             )
@@ -326,10 +424,28 @@ class PelletLevel(hass.Hass):
         # Spike detection (lighting change)
         luma_delta = abs(mean_luma - (self._last_mean_luma if self._last_mean_luma is not None else mean_luma))
         if (not bypass) and (self.brightness_hold_threshold > 0) and (luma_delta >= self.brightness_hold_threshold):
-            # hold previous value; don't update EMA or timestamp, but refresh last luma so we don't lock forever
-            held = True
+            # Confirm a sustained lighting change against the last accepted baseline.
+            # Do not move the baseline on every rejected frame; that previously let a
+            # gradual light transition "walk" into an accepted false pellet level.
+            if (
+                self._pending_mean_luma is not None
+                and abs(mean_luma - self._pending_mean_luma) < 5.0
+            ):
+                self._pending_mean_luma_count += 1
+            else:
+                self._pending_mean_luma = mean_luma
+                self._pending_mean_luma_count = 1
+
+            if self._pending_mean_luma_count < self.brightness_confirmation_samples:
+                held = True
+                return self._last_sacks, False, True
+
             self._last_mean_luma = mean_luma
-            return self._last_sacks, False, True
+            self._pending_mean_luma = None
+            self._pending_mean_luma_count = 0
+        else:
+            self._pending_mean_luma = None
+            self._pending_mean_luma_count = 0
 
         new_val = raw_sacks
 
@@ -356,6 +472,23 @@ class PelletLevel(hass.Hass):
         self._last_update_ts = now
 
         return smoothed, clamped, held
+
+    def _validate_measurement(
+        self,
+        y_level: Optional[int],
+        raw_sacks: float,
+        mean_luma: float,
+    ) -> Tuple[bool, str]:
+        """Reject frames that must not influence the published pellet level."""
+        if y_level is None:
+            return False, "level_line_not_found"
+        if not math.isfinite(raw_sacks):
+            return False, "raw_sacks_not_finite"
+        if self.valid_mean_luma_min is not None and mean_luma < self.valid_mean_luma_min:
+            return False, "mean_luma_below_minimum"
+        if self.valid_mean_luma_max is not None and mean_luma > self.valid_mean_luma_max:
+            return False, "mean_luma_above_maximum"
+        return True, "accepted"
 
     # ---------------- detectors & helpers ----------------
     def _find_first_row_with_count(self, mask: Image.Image, min_white_px: int, min_rows: int) -> Optional[int]:

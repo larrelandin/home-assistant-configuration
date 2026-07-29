@@ -42,6 +42,13 @@ pellet_level:
   ema_alpha: 0.25                 # 0..1 (lower = slower). EMA smoothing on sacks.
   max_delta_sacks_per_min: 1.0    # clamp per-minute change; e.g. 1.0 sack/min
   brightness_hold_threshold: 25   # 0..255 mean-luma jump to treat as lighting spike
+  brightness_confirmation_samples: 5 # accept a sustained lighting change after 2.5 min
+
+  # Reject unusable images before they can reach the min/consumption sensors.
+  # Normal daytime/nighttime frames were observed around mean luma 104-105.
+  valid_mean_luma_min: 90
+  raw_median_window_size: 7       # 3.5 minutes at the current 30s interval
+  raw_min_valid_samples: 5        # keep the previous HA state during warm-up
 
   # OPTIONAL bypass (when filling pellets etc.). If omitted, bypass is off.
   bypass_entity: input_boolean.pellets_filling
